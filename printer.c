@@ -30,7 +30,7 @@ static volatile uint8_t *SERIAL_TX_BUF_DATA_END = SERIAL_TX_BUF_ARR;
  * @return Amount of data which fit into the buffer, bytes.
  */
 static size_t
-serial_tx_write(const uint8_t *ptr, size_t len)
+serial_tx_buf_write(const uint8_t *ptr, size_t len)
 {
     volatile uint8_t *data_ptr = SERIAL_TX_BUF_DATA_PTR;
     volatile uint8_t *data_end = SERIAL_TX_BUF_DATA_END;
@@ -69,7 +69,7 @@ serial_tx_write(const uint8_t *ptr, size_t len)
  * @return True if the byte was read, false if the buffer was empty.
  */
 static bool
-serial_tx_read_byte(uint8_t *pbyte)
+serial_tx_buf_read_byte(uint8_t *pbyte)
 {
     volatile uint8_t *data_ptr = SERIAL_TX_BUF_DATA_PTR;
     volatile uint8_t *data_end = SERIAL_TX_BUF_DATA_END;
@@ -134,13 +134,13 @@ main(void)
      * Write test serial data
      */
     const uint8_t message[] = "Hello, world!\r\n";
-    serial_tx_write(message, sizeof(message) - 1);
+    serial_tx_buf_write(message, sizeof(message) - 1);
 
     /*
      * Transmit serial data
      */
     while (1) {
-        while (serial_tx_read_byte(&b)) {
+        while (serial_tx_buf_read_byte(&b)) {
             /* Wait for transmit register to empty */
             while (!(usart->sr & USART_SR_TXE_MASK));
             /* Write the byte */
