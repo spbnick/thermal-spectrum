@@ -10,15 +10,15 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-/** Serial circular transmit buffer array */
+/** Serial transmit circular buffer array */
 static volatile uint8_t SERIAL_TX_BUF_ARR[1024];
-/** End of serial circular transmit buffer */
+/** End of serial transmit circular buffer */
 static const volatile uint8_t *SERIAL_TX_BUF_END =
                                 SERIAL_TX_BUF_ARR +
                                 ARRAY_SIZE(SERIAL_TX_BUF_ARR);
-/** Start of valid data in serial circular transmit buffer */
+/** Start of valid data in serial transmit circular buffer */
 static volatile uint8_t *SERIAL_TX_BUF_DATA_PTR = SERIAL_TX_BUF_ARR;
-/** End of valid data in serial circular transmit buffer */
+/** End of valid data in serial transmit circular buffer */
 static volatile uint8_t *SERIAL_TX_BUF_DATA_END = SERIAL_TX_BUF_ARR;
 
 /**
