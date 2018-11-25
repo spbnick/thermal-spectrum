@@ -7,6 +7,8 @@ LIBS = -lstammer
 # Program name
 NAME = printer
 
+all: $(NAME).bin
+
 # Module names in order of symbol resolution
 MODS = \
     $(NAME)
@@ -18,8 +20,6 @@ DEPS = $(OBJS:.o=.d)
 -include $(DEPS)
 
 .PHONY: clean
-
-all: $(NAME).bin
 
 %.o: %.c
 	$(CCPFX)gcc $(COMMON_CFLAGS) $(CFLAGS) -c -o $@ $<
