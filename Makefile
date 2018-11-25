@@ -15,6 +15,7 @@ MODS = \
 OBJS = $(addsuffix .o, $(MODS))
 # Make dependency rules
 DEPS = $(OBJS:.o=.d)
+-include $(DEPS)
 
 .PHONY: clean
 
