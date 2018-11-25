@@ -5,7 +5,7 @@ COMMON_CFLAGS = $(TARGET_CFLAGS) -Wall -Wextra -Werror -g3
 LIBS = -lstammer
 
 # Program name
-NAME = printer
+NAME = ts
 
 all: $(NAME).bin
 

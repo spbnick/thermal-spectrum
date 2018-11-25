@@ -1,5 +1,5 @@
 /*
- * A ZX-printer interface for a thermal printer module
+ * Thermal Spectrum - a ZX-printer interface for a thermal printer module
  */
 #include <init.h>
 #include <usart.h>
