@@ -13,6 +13,7 @@ all: $(NAME).bin
 MODS = \
     circular_buf \
     serial \
+    printer \
     $(NAME)
 
 # Object files
