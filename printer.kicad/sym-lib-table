@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name printer)(type Legacy)(uri /home/nick/projects/github.com/spbnick/zx-thermal-printer/printer.kicad/printer.lib)(options "")(descr ""))
+  (lib (name printer-rescue)(type Legacy)(uri ${KIPRJMOD}/printer-rescue.lib)(options "")(descr ""))
+)
