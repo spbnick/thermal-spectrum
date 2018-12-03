@@ -20,3 +20,4 @@ After that you can build the firmware using `make`.
 
 [development_setup_thumb]: development_setup.thumb.jpg
 [development_setup]: development_setup.jpg
+[libstammer]: https://github.com/spbnick/libstammer
