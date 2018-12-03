@@ -5,9 +5,6 @@ Spectrum computer.
 
 [![Development setup][development_setup_thumb]][development_setup]
 
-[development_setup_thumb]: development_setup.thumb.jpg
-[development_setup]: development_setup.jpg
-
 Building the firmware
 ---------------------
 First you'll need the compiler. If you're using a Debian-based Linux you can
@@ -20,3 +17,6 @@ variables pointing to it:
 `LIBSTAMMER_DIR` above is the directory where libstammer build is located.
 
 After that you can build the firmware using `make`.
+
+[development_setup_thumb]: development_setup.thumb.jpg
+[development_setup]: development_setup.jpg
