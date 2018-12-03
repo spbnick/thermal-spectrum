@@ -1,7 +1,7 @@
 Thermal Spectrum
 ================
-Thermal Spectrum is a thermal printer module interface for ZX Spectrum
-computer, using the ZX Printer interface.
+Thermal Spectrum is a ZX Printer interface to a thermal printer module, for ZX
+Spectrum computer.
 
 [![Development setup][development_setup_thumb]][development_setup]
 
