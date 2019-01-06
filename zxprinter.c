@@ -198,7 +198,7 @@ zxprinter_init(volatile struct gpio *gpio,
                          TIM_CR1_ARPE_MASK;
     /* Enable Capture/Compare 1 interrupt */
     zxprinter_tim->dier |= TIM_DIER_CC1IE_MASK;
-    
+
 #if 0
     /* Set timer period */
     zxprinter_tim->arr = ZXPRINTER_ENCODER_TIM_NORMAL_PERIOD_US;
