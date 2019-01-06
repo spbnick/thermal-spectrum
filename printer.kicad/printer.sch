@@ -17,34 +17,12 @@ $EndDescr
 $Comp
 L printer-rescue:STM32F103C8T6_DEVBOARD-printer U?
 U 1 1 5B2F3F40
-P 9050 2300
-F 0 "U?" H 9050 3937 60  0000 C CNN
-F 1 "STM32F103C8T6_DEVBOARD" H 9050 3831 60  0000 C CNN
-F 2 "" H 9250 2650 60  0000 C CNN
-F 3 "" H 9250 2650 60  0000 C CNN
-	1    9050 2300
-	1    0    0    -1  
-$EndComp
-$Comp
-L 74xx_IEEE:7413 U?
-U 1 1 5B2F405A
-P 4500 1150
-F 0 "U?" H 4475 1616 50  0000 C CNN
-F 1 "D3413A" H 4475 1525 50  0000 C CNN
-F 2 "" H 4500 1150 50  0001 C CNN
-F 3 "" H 4500 1150 50  0001 C CNN
-	1    4500 1150
-	1    0    0    -1  
-$EndComp
-$Comp
-L 74xx_IEEE:7404 U?
-U 1 1 5B2F41D8
-P 3300 1100
-F 0 "U?" H 3300 1566 50  0000 C CNN
-F 1 "D3404A" H 3300 1475 50  0000 C CNN
-F 2 "" H 3300 1100 50  0001 C CNN
-F 3 "" H 3300 1100 50  0001 C CNN
-	1    3300 1100
+P 9150 2200
+F 0 "U?" H 9150 3837 60  0000 C CNN
+F 1 "STM32F103C8T6_DEVBOARD" H 9150 3731 60  0000 C CNN
+F 2 "" H 9350 2550 60  0000 C CNN
+F 3 "" H 9350 2550 60  0000 C CNN
+	1    9150 2200
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -68,164 +46,6 @@ Wire Wire Line
 	1100 2650 850  2650
 Wire Wire Line
 	1600 1850 1850 1850
-$Comp
-L 74xx_IEEE:7404 U?
-U 2 1 5B3649AF
-P 3300 1950
-F 0 "U?" H 3300 2416 50  0000 C CNN
-F 1 "D3404A" H 3300 2325 50  0000 C CNN
-F 2 "" H 3300 1950 50  0001 C CNN
-F 3 "" H 3300 1950 50  0001 C CNN
-	2    3300 1950
-	1    0    0    -1  
-$EndComp
-$Comp
-L 74xx_IEEE:7404 U?
-U 5 1 5B364A8A
-P 5550 1150
-F 0 "U?" H 5550 1616 50  0000 C CNN
-F 1 "D3404A" H 5550 1525 50  0000 C CNN
-F 2 "" H 5550 1150 50  0001 C CNN
-F 3 "" H 5550 1150 50  0001 C CNN
-	5    5550 1150
-	1    0    0    -1  
-$EndComp
-$Comp
-L 74xx_IEEE:7413 U?
-U 2 1 5B364BD9
-P 5550 2700
-F 0 "U?" H 5525 3166 50  0000 C CNN
-F 1 "D3413A" H 5525 3075 50  0000 C CNN
-F 2 "" H 5550 2700 50  0001 C CNN
-F 3 "" H 5550 2700 50  0001 C CNN
-	2    5550 2700
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:+5V #PWR?
-U 1 1 5B365655
-P 3950 1000
-F 0 "#PWR?" H 3950 850 50  0001 C CNN
-F 1 "+5V" H 3965 1173 50  0000 C CNN
-F 2 "" H 3950 1000 50  0001 C CNN
-F 3 "" H 3950 1000 50  0001 C CNN
-	1    3950 1000
-	1    0    0    -1  
-$EndComp
-$Comp
-L 74xx_IEEE:7413 U?
-U 1 1 5B365B00
-P 4500 2750
-F 0 "U?" H 4475 3216 50  0000 C CNN
-F 1 "D3413A" H 4475 3125 50  0000 C CNN
-F 2 "" H 4500 2750 50  0001 C CNN
-F 3 "" H 4500 2750 50  0001 C CNN
-	1    4500 2750
-	1    0    0    -1  
-$EndComp
-$Comp
-L 74xx_IEEE:7413 U?
-U 2 1 5B365BA2
-P 4500 3700
-F 0 "U?" H 4475 4166 50  0000 C CNN
-F 1 "D3413A" H 4475 4075 50  0000 C CNN
-F 2 "" H 4500 3700 50  0001 C CNN
-F 3 "" H 4500 3700 50  0001 C CNN
-	2    4500 3700
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	5000 3700 5000 2850
-$Comp
-L power:+5V #PWR?
-U 1 1 5B366490
-P 5000 2550
-F 0 "#PWR?" H 5000 2400 50  0001 C CNN
-F 1 "+5V" H 5015 2723 50  0000 C CNN
-F 2 "" H 5000 2550 50  0001 C CNN
-F 3 "" H 5000 2550 50  0001 C CNN
-	1    5000 2550
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	5000 2550 5000 2650
-Connection ~ 5000 2550
-$Comp
-L 74xx_IEEE:7404 U?
-U 3 1 5B367109
-P 3300 2800
-F 0 "U?" H 3300 3266 50  0000 C CNN
-F 1 "D3404A" H 3300 3175 50  0000 C CNN
-F 2 "" H 3300 2800 50  0001 C CNN
-F 3 "" H 3300 2800 50  0001 C CNN
-	3    3300 2800
-	1    0    0    -1  
-$EndComp
-$Comp
-L 74xx_IEEE:7404 U?
-U 4 1 5B3671B5
-P 3300 3750
-F 0 "U?" H 3300 4216 50  0000 C CNN
-F 1 "D3404A" H 3300 4125 50  0000 C CNN
-F 2 "" H 3300 3750 50  0001 C CNN
-F 3 "" H 3300 3750 50  0001 C CNN
-	4    3300 3750
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	2650 4100 2650 3350
-Wire Wire Line
-	2650 2800 2750 2800
-Wire Wire Line
-	2750 3150 3950 3150
-Wire Wire Line
-	3950 3150 3950 2900
-Wire Wire Line
-	2650 4100 3950 4100
-Wire Wire Line
-	3950 4100 3950 3850
-Wire Wire Line
-	3950 3650 3950 3550
-$Comp
-L power:+5V #PWR?
-U 1 1 5B368E64
-P 3950 3550
-F 0 "#PWR?" H 3950 3400 50  0001 C CNN
-F 1 "+5V" H 3965 3723 50  0000 C CNN
-F 2 "" H 3950 3550 50  0001 C CNN
-F 3 "" H 3950 3550 50  0001 C CNN
-	1    3950 3550
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:+5V #PWR?
-U 1 1 5B368EA7
-P 3950 2600
-F 0 "#PWR?" H 3950 2450 50  0001 C CNN
-F 1 "+5V" H 3965 2773 50  0000 C CNN
-F 2 "" H 3950 2600 50  0001 C CNN
-F 3 "" H 3950 2600 50  0001 C CNN
-	1    3950 2600
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	3950 2700 3950 2600
-Connection ~ 3950 2600
-Connection ~ 3950 3550
-Wire Wire Line
-	3850 1950 3850 1200
-Wire Wire Line
-	3850 1200 3950 1200
-Wire Wire Line
-	3850 1100 3950 1100
-Wire Wire Line
-	6050 2700 6050 1950
-Wire Wire Line
-	6050 1950 3950 1950
-Wire Wire Line
-	3950 1950 3950 1300
-Wire Wire Line
-	2750 3150 2750 3450
 Text Label 850  1050 0    50   ~ 0
 D7
 Text Label 850  1350 0    50   ~ 0
@@ -246,8 +66,6 @@ Wire Wire Line
 	850  1550 1100 1550
 Wire Wire Line
 	850  1650 1100 1650
-Wire Wire Line
-	2450 1100 2750 1100
 Text Label 850  2450 0    50   ~ 0
 ~IORQ~
 Text Label 850  2550 0    50   ~ 0
@@ -256,52 +74,8 @@ Text Label 850  2650 0    50   ~ 0
 ~WR~
 Text Label 1750 1850 0    50   ~ 0
 A2
-Text Label 2450 1100 0    50   ~ 0
-~IORQ~
-Wire Wire Line
-	2750 1950 2450 1950
-Text Label 2450 1950 0    50   ~ 0
-A2
-Wire Wire Line
-	2650 3350 2450 3350
-Connection ~ 2650 3350
-Wire Wire Line
-	2650 3350 2650 2800
-Text Label 2450 3350 0    50   ~ 0
-~RD~
-Wire Wire Line
-	2750 3450 2450 3450
-Connection ~ 2750 3450
-Wire Wire Line
-	2750 3450 2750 3750
-Text Label 2450 3450 0    50   ~ 0
-~WR~
-Wire Wire Line
-	3850 2800 3850 2600
-Wire Wire Line
-	3850 2600 3700 2600
-Text Label 3700 2600 0    50   ~ 0
-RD
-Wire Wire Line
-	3850 2800 3950 2800
-Connection ~ 3850 2800
-Wire Wire Line
-	3850 3750 3950 3750
-Wire Wire Line
-	6100 1150 6400 1150
-Text Label 6100 1150 0    50   ~ 0
-SELECT
-Wire Wire Line
-	3850 3750 3850 3550
-Wire Wire Line
-	3850 3550 3700 3550
-Connection ~ 3850 3750
-Text Label 3700 3550 0    50   ~ 0
-WR
-Text Label 5550 1950 0    50   ~ 0
-READ|WRITE
 $Bitmap
-Pos 8850 5300
+Pos 8900 5250
 Scale 1.000000
 Data
 89 50 4E 47 0D 0A 1A 0A 00 00 00 0D 49 48 44 52 00 00 05 00 00 00 02 A9 08 02 00 00 00 6C 32 16 
@@ -19425,115 +19199,95 @@ $EndBitmap
 $Comp
 L power:+5V #PWR?
 U 1 1 5B3A07C0
-P 8250 950
-F 0 "#PWR?" H 8250 800 50  0001 C CNN
-F 1 "+5V" H 8265 1123 50  0000 C CNN
-F 2 "" H 8250 950 50  0001 C CNN
-F 3 "" H 8250 950 50  0001 C CNN
-	1    8250 950 
+P 8350 850
+F 0 "#PWR?" H 8350 700 50  0001 C CNN
+F 1 "+5V" H 8365 1023 50  0000 C CNN
+F 2 "" H 8350 850 50  0001 C CNN
+F 3 "" H 8350 850 50  0001 C CNN
+	1    8350 850 
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR?
 U 1 1 5B3A082D
-P 8250 3800
-F 0 "#PWR?" H 8250 3550 50  0001 C CNN
-F 1 "GND" H 8255 3627 50  0000 C CNN
-F 2 "" H 8250 3800 50  0001 C CNN
-F 3 "" H 8250 3800 50  0001 C CNN
-	1    8250 3800
+P 8350 3700
+F 0 "#PWR?" H 8350 3450 50  0001 C CNN
+F 1 "GND" H 8355 3527 50  0000 C CNN
+F 2 "" H 8350 3700 50  0001 C CNN
+F 3 "" H 8350 3700 50  0001 C CNN
+	1    8350 3700
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9850 1550 10200 1550
-Text Label 9900 1550 0    50   ~ 0
+	9950 3100 10300 3100
+Text Label 10000 3100 0    50   ~ 0
 SELECT
 Wire Wire Line
-	9850 1700 10200 1700
-Text Label 9900 1700 0    50   ~ 0
+	9950 3250 10300 3250
+Text Label 10000 3250 0    50   ~ 0
 RD
-Wire Wire Line
-	9850 2150 10200 2150
-Wire Wire Line
-	9850 2300 10200 2300
-Wire Wire Line
-	9850 2450 10200 2450
-Wire Wire Line
-	9850 2900 10200 2900
-Wire Wire Line
-	9850 3050 10200 3050
-Text Label 9900 2150 0    50   ~ 0
-D0
-Text Label 9900 2300 0    50   ~ 0
-D1
-Text Label 9900 2450 0    50   ~ 0
-D2
-Text Label 9900 2900 0    50   ~ 0
-D6
-Text Label 9900 3050 0    50   ~ 0
-D7
 $Comp
 L Connector:Conn_01x05_Male J?
 U 1 1 5BB3178D
-P 800 4400
-F 0 "J?" H 906 4778 50  0000 C CNN
-F 1 "Printer" H 906 4687 50  0000 C CNN
-F 2 "" H 800 4400 50  0001 C CNN
-F 3 "~" H 800 4400 50  0001 C CNN
-	1    800  4400
+P 850 4400
+F 0 "J?" H 956 4778 50  0000 C CNN
+F 1 "Printer" H 956 4687 50  0000 C CNN
+F 2 "" H 850 4400 50  0001 C CNN
+F 3 "~" H 850 4400 50  0001 C CNN
+	1    850  4400
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	1000 4200 1900 4200
+	1050 4200 1950 4200
 Wire Wire Line
-	1000 4300 1900 4300
+	1050 4300 1950 4300
 Wire Wire Line
-	1000 4400 1900 4400
+	1050 4400 1950 4400
 Wire Wire Line
-	1000 4500 1900 4500
+	1050 4500 1950 4500
 Wire Wire Line
-	1000 4600 1900 4600
-Text Notes 1050 4600 0    50   ~ 0
+	1050 4600 1950 4600
+Text Notes 1100 4600 0    50   ~ 0
 Black
-Text Notes 1050 4500 0    50   ~ 0
+Text Notes 1100 4500 0    50   ~ 0
 Blue
-Text Notes 1050 4400 0    50   ~ 0
+Text Notes 1100 4400 0    50   ~ 0
 Green
-Text Notes 1050 4300 0    50   ~ 0
+Text Notes 1100 4300 0    50   ~ 0
 Yellow
-Text Notes 1050 4200 0    50   ~ 0
+Text Notes 1100 4200 0    50   ~ 0
 Red
 $Comp
 L power:+5V #PWR?
 U 1 1 5BB34EF3
-P 1900 4200
-F 0 "#PWR?" H 1900 4050 50  0001 C CNN
-F 1 "+5V" H 1915 4373 50  0000 C CNN
-F 2 "" H 1900 4200 50  0001 C CNN
-F 3 "" H 1900 4200 50  0001 C CNN
-	1    1900 4200
+P 1950 4200
+F 0 "#PWR?" H 1950 4050 50  0001 C CNN
+F 1 "+5V" H 1965 4373 50  0000 C CNN
+F 2 "" H 1950 4200 50  0001 C CNN
+F 3 "" H 1950 4200 50  0001 C CNN
+	1    1950 4200
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR?
 U 1 1 5BB3515A
-P 1900 4600
-F 0 "#PWR?" H 1900 4350 50  0001 C CNN
-F 1 "GND" H 1905 4427 50  0000 C CNN
-F 2 "" H 1900 4600 50  0001 C CNN
-F 3 "" H 1900 4600 50  0001 C CNN
-	1    1900 4600
+P 1950 4600
+F 0 "#PWR?" H 1950 4350 50  0001 C CNN
+F 1 "GND" H 1955 4427 50  0000 C CNN
+F 2 "" H 1950 4600 50  0001 C CNN
+F 3 "" H 1950 4600 50  0001 C CNN
+	1    1950 4600
 	1    0    0    -1  
 $EndComp
-Text Label 1350 4200 0    50   ~ 0
+Text Label 1400 4200 0    50   ~ 0
 PRINTER_VH
-Text Label 1350 4300 0    50   ~ 0
+Text Label 1400 4300 0    50   ~ 0
 PRINTER_DTR
-Text Label 1350 4500 0    50   ~ 0
+Text Label 1400 4500 0    50   ~ 0
 PRINTER_TX
-Text Label 1350 4400 0    50   ~ 0
+Text Label 1400 4400 0    50   ~ 0
 PRINTER_RX
-Text Label 1350 4600 0    50   ~ 0
+Text Label 1400 4600 0    50   ~ 0
 PRINTER_GND
 Wire Wire Line
 	1600 1150 1850 1150
@@ -19549,27 +19303,467 @@ F 3 "" H 1850 1150 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	7800 1700 8250 1700
+	7900 1600 8350 1600
 Wire Wire Line
-	7800 1850 8250 1850
-Text Label 7800 1700 0    50   ~ 0
+	7900 1750 8350 1750
+Text Label 7900 1600 0    50   ~ 0
 PRINTER_TX
-Text Label 7800 1850 0    50   ~ 0
+Text Label 7900 1750 0    50   ~ 0
 PRINTER_RX
 Wire Wire Line
-	8250 2750 7800 2750
+	8350 2650 7900 2650
 Wire Wire Line
-	8250 2900 7800 2900
-Text Label 7800 2900 0    50   ~ 0
+	8350 2800 7900 2800
+Text Label 7900 2800 0    50   ~ 0
 PROGRAM_RX
-Text Label 7800 2750 0    50   ~ 0
+Text Label 7900 2650 0    50   ~ 0
 PROGRAM_TX
 Wire Wire Line
-	9850 2600 10200 2600
-Text Label 9850 2600 0    50   ~ 0
+	9950 2500 10300 2500
+Text Label 9950 2500 0    50   ~ 0
 DEBUG_TX
-Wire Wire Line
-	9850 2750 10200 2750
-Text Label 9850 2750 0    50   ~ 0
+Text Label 9950 2650 0    50   ~ 0
 DEBUG_RX
+Wire Wire Line
+	9950 2650 10300 2650
+$Comp
+L 74xx:74LS373 U?
+U 1 1 5C2A317C
+P 5350 6250
+F 0 "U?" H 5150 6950 50  0000 C CNN
+F 1 "74AC373" H 5550 6950 50  0000 C CNN
+F 2 "" H 5350 6250 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS373" H 5350 6250 50  0001 C CNN
+	1    5350 6250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5850 6350 5950 6350
+Wire Wire Line
+	5850 6450 5950 6450
+Text Label 5850 6350 0    50   ~ 0
+D6
+Text Label 5850 6450 0    50   ~ 0
+D7
+Wire Wire Line
+	5850 5750 5950 5750
+Text Label 5850 5750 0    50   ~ 0
+D0
+Wire Wire Line
+	900  5850 1300 5850
+Wire Wire Line
+	900  5950 1300 5950
+Text Label 900  5850 0    50   ~ 0
+D1
+Text Label 900  5950 0    50   ~ 0
+D2
+Wire Wire Line
+	900  6450 1300 6450
+Text Label 900  6450 0    50   ~ 0
+D7
+Text Notes 1450 5500 0    50   ~ 0
+INPUT
+Text Notes 4950 5500 0    50   ~ 0
+OUTPUT
+Wire Wire Line
+	900  6650 1300 6650
+Text Label 900  6650 0    50   ~ 0
+DEVICE_WR
+Text Label 2300 5950 0    50   ~ 0
+MOTOR_STOP
+Text Label 2300 5850 0    50   ~ 0
+MOTOR_SLOW
+Text Label 3450 6450 0    50   ~ 0
+~STYLUS
+Wire Wire Line
+	2300 5950 4850 5950
+Wire Wire Line
+	4850 5850 2300 5850
+$Comp
+L power:GND #PWR?
+U 1 1 5C2D70C3
+P 1100 6050
+F 0 "#PWR?" H 1100 5800 50  0001 C CNN
+F 1 "GND" H 1105 5877 50  0000 C CNN
+F 2 "" H 1100 6050 50  0001 C CNN
+F 3 "" H 1100 6050 50  0001 C CNN
+	1    1100 6050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1100 6050 1300 6050
+Wire Wire Line
+	4850 6250 4850 6150
+Connection ~ 4850 6150
+Wire Wire Line
+	4850 6150 4850 6050
+$Comp
+L power:GND #PWR?
+U 1 1 5C2DB183
+P 4600 6050
+F 0 "#PWR?" H 4600 5800 50  0001 C CNN
+F 1 "GND" H 4605 5877 50  0000 C CNN
+F 2 "" H 4600 6050 50  0001 C CNN
+F 3 "" H 4600 6050 50  0001 C CNN
+	1    4600 6050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4600 6050 4850 6050
+Connection ~ 4850 6050
+Wire Wire Line
+	5850 5850 5950 5850
+Wire Wire Line
+	5850 5950 5950 5950
+Text Label 5850 5850 0    50   ~ 0
+D1
+Text Label 5850 5950 0    50   ~ 0
+D2
+Wire Wire Line
+	3450 6850 3950 6850
+Text Label 3450 6850 0    50   ~ 0
+DEVICE_RD
+Wire Wire Line
+	3450 7050 3950 7050
+Text Label 3450 7050 0    50   ~ 0
+READY
+Wire Wire Line
+	4550 6950 4850 6950
+Wire Wire Line
+	4850 6950 4850 6750
+Wire Wire Line
+	4850 6350 4850 6250
+Connection ~ 4850 6250
+$Comp
+L power:GND #PWR?
+U 1 1 5C355B7A
+P 1800 7050
+F 0 "#PWR?" H 1800 6800 50  0001 C CNN
+F 1 "GND" H 1805 6877 50  0000 C CNN
+F 2 "" H 1800 7050 50  0001 C CNN
+F 3 "" H 1800 7050 50  0001 C CNN
+	1    1800 7050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5C355B9F
+P 5350 7050
+F 0 "#PWR?" H 5350 6800 50  0001 C CNN
+F 1 "GND" H 5355 6877 50  0000 C CNN
+F 2 "" H 5350 7050 50  0001 C CNN
+F 3 "" H 5350 7050 50  0001 C CNN
+	1    5350 7050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR?
+U 1 1 5C355DBF
+P 1800 5450
+F 0 "#PWR?" H 1800 5300 50  0001 C CNN
+F 1 "+5V" H 1815 5623 50  0000 C CNN
+F 2 "" H 1800 5450 50  0001 C CNN
+F 3 "" H 1800 5450 50  0001 C CNN
+	1    1800 5450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR?
+U 1 1 5C35601B
+P 5350 5450
+F 0 "#PWR?" H 5350 5300 50  0001 C CNN
+F 1 "+5V" H 5365 5623 50  0000 C CNN
+F 2 "" H 5350 5450 50  0001 C CNN
+F 3 "" H 5350 5450 50  0001 C CNN
+	1    5350 5450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3450 6250 3950 6250
+Text Label 3450 6250 0    50   ~ 0
+~PAPER_LATCH
+Wire Wire Line
+	4750 6450 4850 6450
+Connection ~ 1300 6050
+Wire Wire Line
+	1300 6350 1300 6250
+Connection ~ 1300 6250
+Wire Wire Line
+	1300 6250 1300 6150
+Wire Wire Line
+	1300 6150 1300 6050
+Connection ~ 1300 6150
+$Comp
+L 74xx:74LS373 U?
+U 1 1 5C29EFBB
+P 1800 6250
+F 0 "U?" H 1600 6950 50  0000 C CNN
+F 1 "74AC373" H 2000 6950 50  0000 C CNN
+F 2 "" H 1800 6250 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS373" H 1800 6250 50  0001 C CNN
+	1    1800 6250
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74HCT02 U?
+U 1 1 5C53BE86
+P 2900 2300
+F 0 "U?" H 2900 2625 50  0000 C CNN
+F 1 "74HCT02" H 2900 2534 50  0000 C CNN
+F 2 "" H 2900 2300 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74hct02" H 2900 2300 50  0001 C CNN
+	1    2900 2300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2200 2200 2600 2200
+Text Label 2200 2200 0    50   ~ 0
+DEVICE_WR
+$Comp
+L 74xx:74HCT02 U?
+U 2 1 5C53BE8F
+P 3750 2200
+F 0 "U?" H 3750 2525 50  0000 C CNN
+F 1 "74HCT02" H 3750 2434 50  0000 C CNN
+F 2 "" H 3750 2200 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74hct02" H 3750 2200 50  0001 C CNN
+	2    3750 2200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3450 2100 3200 2100
+Text Label 3200 2100 0    50   ~ 0
+PAPER
+Wire Wire Line
+	4050 2550 2600 2550
+Wire Wire Line
+	2600 2550 2600 2400
+Wire Wire Line
+	4050 2200 4700 2200
+Text Label 4200 2200 0    50   ~ 0
+~PAPER_LATCH
+Wire Wire Line
+	4050 2200 4050 2550
+Wire Wire Line
+	3200 2300 3450 2300
+$Comp
+L 74xx:74HCT02 U?
+U 3 1 5C56B961
+P 2900 3100
+F 0 "U?" H 2900 3425 50  0000 C CNN
+F 1 "74HCT02" H 2900 3334 50  0000 C CNN
+F 2 "" H 2900 3100 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74hct02" H 2900 3100 50  0001 C CNN
+	3    2900 3100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2200 3000 2600 3000
+Text Label 2200 3000 0    50   ~ 0
+DEVICE_WR
+$Comp
+L 74xx:74HCT02 U?
+U 4 1 5C56B96A
+P 3750 3000
+F 0 "U?" H 3750 3325 50  0000 C CNN
+F 1 "74HCT02" H 3750 3234 50  0000 C CNN
+F 2 "" H 3750 3000 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74hct02" H 3750 3000 50  0001 C CNN
+	4    3750 3000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4050 3350 2600 3350
+Wire Wire Line
+	2600 3350 2600 3200
+Wire Wire Line
+	4050 3000 4050 3350
+Wire Wire Line
+	3200 3100 3450 3100
+Wire Wire Line
+	3450 2900 3100 2900
+Text Label 3100 2900 0    50   ~ 0
+ENCODER
+Wire Wire Line
+	4050 3000 4700 3000
+Text Label 4100 3000 0    50   ~ 0
+~ENCODER_LATCH
+Text Label 2200 1550 0    50   ~ 0
+~RD~
+Wire Wire Line
+	3600 800  2200 800 
+Text Label 2200 800  0    50   ~ 0
+~WR~
+Text Label 2200 1350 0    50   ~ 0
+A2
+Wire Wire Line
+	2400 1350 2200 1350
+Text Label 2200 1150 0    50   ~ 0
+~IORQ~
+Wire Wire Line
+	2200 1150 2400 1150
+Wire Wire Line
+	2200 1550 3600 1550
+Wire Wire Line
+	4200 1450 4650 1450
+Wire Wire Line
+	4200 900  4650 900 
+Connection ~ 4050 2200
+$Comp
+L 74xx:74HCT00 U?
+U 3 1 5C5C6C9C
+P 4250 6350
+F 0 "U?" H 4250 6675 50  0000 C CNN
+F 1 "74HCT00" H 4250 6584 50  0000 C CNN
+F 2 "" H 4250 6350 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74hct00" H 4250 6350 50  0001 C CNN
+	3    4250 6350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2300 6450 2850 6450
+Wire Wire Line
+	3450 6450 3950 6450
+Text Label 2300 6450 0    50   ~ 0
+STYLUS
+$Comp
+L 74xx:74HCT00 U?
+U 4 1 5C5D0DCF
+P 4250 6950
+F 0 "U?" H 4250 7275 50  0000 C CNN
+F 1 "74HCT00" H 4250 7184 50  0000 C CNN
+F 2 "" H 4250 6950 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74hct00" H 4250 6950 50  0001 C CNN
+	4    4250 6950
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR?
+U 1 1 5C5D3274
+P 4600 6650
+F 0 "#PWR?" H 4600 6500 50  0001 C CNN
+F 1 "+5V" H 4615 6823 50  0000 C CNN
+F 2 "" H 4600 6650 50  0001 C CNN
+F 3 "" H 4600 6650 50  0001 C CNN
+	1    4600 6650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4750 6450 4750 6350
+Wire Wire Line
+	4750 6350 4550 6350
+Wire Wire Line
+	4600 6650 4850 6650
+$Comp
+L power:GND #PWR?
+U 1 1 5C5FF0F6
+P 1300 6750
+F 0 "#PWR?" H 1300 6500 50  0001 C CNN
+F 1 "GND" H 1305 6577 50  0000 C CNN
+F 2 "" H 1300 6750 50  0001 C CNN
+F 3 "" H 1300 6750 50  0001 C CNN
+	1    1300 6750
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74HCT02 U?
+U 1 1 5C60A5B9
+P 2700 1250
+F 0 "U?" H 2700 1575 50  0000 C CNN
+F 1 "74HCT02" H 2700 1484 50  0000 C CNN
+F 2 "" H 2700 1250 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74hct02" H 2700 1250 50  0001 C CNN
+	1    2700 1250
+	1    0    0    -1  
+$EndComp
+Text Label 4250 900  0    50   ~ 0
+DEVICE_WR
+Text Label 4250 1450 0    50   ~ 0
+DEVICE_RD
+$Comp
+L 74xx:74HCT02 U?
+U 3 1 5C60CCCD
+P 3900 900
+F 0 "U?" H 3900 1225 50  0000 C CNN
+F 1 "74HCT02" H 3900 1134 50  0000 C CNN
+F 2 "" H 3900 900 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74hct02" H 3900 900 50  0001 C CNN
+	3    3900 900 
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74HCT02 U?
+U 4 1 5C60CD15
+P 3900 1450
+F 0 "U?" H 3900 1775 50  0000 C CNN
+F 1 "74HCT02" H 3900 1684 50  0000 C CNN
+F 2 "" H 3900 1450 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74hct02" H 3900 1450 50  0001 C CNN
+	4    3900 1450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4850 5750 4850 5600
+Wire Wire Line
+	3450 5600 4250 5600
+Text Label 3450 5600 0    50   ~ 0
+~ENCODER_LATCH
+Connection ~ 4050 3000
+Wire Wire Line
+	3600 1000 3600 1250
+$Comp
+L 74xx:74HCT02 U?
+U 2 1 5C63085E
+P 3300 1250
+F 0 "U?" H 3300 1575 50  0000 C CNN
+F 1 "74HCT02" H 3300 1484 50  0000 C CNN
+F 2 "" H 3300 1250 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74hct02" H 3300 1250 50  0001 C CNN
+	2    3300 1250
+	1    0    0    -1  
+$EndComp
+Connection ~ 3600 1250
+Wire Wire Line
+	3600 1250 3600 1350
+Wire Wire Line
+	3000 1150 3000 1250
+Connection ~ 3000 1250
+Wire Wire Line
+	3000 1250 3000 1350
+$Comp
+L 74xx:74HCT00 U?
+U 1 1 5C632AEA
+P 4550 5600
+F 0 "U?" H 4550 5925 50  0000 C CNN
+F 1 "74HCT00" H 4550 5834 50  0000 C CNN
+F 2 "" H 4550 5600 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74hct00" H 4550 5600 50  0001 C CNN
+	1    4550 5600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4250 5500 4250 5600
+Connection ~ 4250 5600
+Wire Wire Line
+	4250 5600 4250 5700
+$Comp
+L 74xx:74HCT00 U?
+U 2 1 5C634D8A
+P 3150 6450
+F 0 "U?" H 3150 6775 50  0000 C CNN
+F 1 "74HCT00" H 3150 6684 50  0000 C CNN
+F 2 "" H 3150 6450 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74hct00" H 3150 6450 50  0001 C CNN
+	2    3150 6450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2850 6350 2850 6450
+Connection ~ 2850 6450
+Wire Wire Line
+	2850 6450 2850 6550
+Text Notes 3000 700  0    50   ~ 0
+Decoding
+Text Notes 3050 1900 0    50   ~ 0
+Latches
 $EndSCHEMATC
