@@ -14,6 +14,7 @@ MODS = \
     circular_buf \
     serial \
     printer \
+    zxprinter \
     $(NAME)
 
 # Object files

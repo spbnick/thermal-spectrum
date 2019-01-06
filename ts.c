@@ -2,11 +2,14 @@
  * Thermal Spectrum - a ZX-printer interface for a thermal printer module
  */
 #include "printer.h"
+#include "zxprinter.h"
 #include <init.h>
 #include <usart.h>
 #include <gpio.h>
+#include <afio.h>
 #include <rcc.h>
 #include <nvic.h>
+#include <exti.h>
 #include <misc.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -18,6 +21,37 @@ tim2_irq_handler(void)
 {
     printer_handler();
 }
+
+void tim3_irq_handler(void) __attribute__ ((isr));
+void
+tim3_irq_handler(void)
+{
+    zxprinter_tim_handler();
+}
+
+void
+exti_handler(void)
+{
+    GPIO_A->odr = (GPIO_A->odr & ~(1 << 7)) |
+                  (((GPIO_B->idr & (1 << ZXPRINTER_PIN_SELECT)) >> ZXPRINTER_PIN_SELECT) << 7);
+    EXTI->pr |= (1 << ZXPRINTER_PIN_SELECT);
+}
+
+#define EXTI_IRQ_HANDLER(_name) \
+    void                                    \
+    _name(void)                             \
+    {                                       \
+        exti_handler();                     \
+    }                                       \
+    void _name(void) __attribute__ ((isr))
+
+EXTI_IRQ_HANDLER(exti0_irq_handler);
+EXTI_IRQ_HANDLER(exti1_irq_handler);
+EXTI_IRQ_HANDLER(exti2_irq_handler);
+EXTI_IRQ_HANDLER(exti3_irq_handler);
+EXTI_IRQ_HANDLER(exti4_irq_handler);
+EXTI_IRQ_HANDLER(exti9_5_irq_handler);
+EXTI_IRQ_HANDLER(exti15_10_irq_handler);
 
 static const uint8_t TEST_IMAGE[][384 / 8] = {
     {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -1471,8 +1505,9 @@ main(void)
     /*
      * Enable clocks
      */
-    /* Enable APB2 clock to I/O ports A and B */
-    RCC->apb2enr |= RCC_APB2ENR_IOPAEN_MASK | RCC_APB2ENR_IOPBEN_MASK;
+    /* Enable APB2 clock to I/O ports A and B, and AFIO */
+    RCC->apb2enr |= RCC_APB2ENR_IOPAEN_MASK | RCC_APB2ENR_IOPBEN_MASK |
+                    RCC_APB2ENR_AFIOEN_MASK;
 
     /*
      * Initialize debug GPIO pin
@@ -1498,7 +1533,8 @@ main(void)
 
 
     /*
-     * Initialize printer USART
+     * Setup printer with USART2 at 9600 baud rate and
+     * TIM2 timer fed by doubled 36MHz APB1 clock
      */
     /* Configure printer TX pin (PA2) */
     gpio_pin_conf(GPIO_A, 2,
@@ -1513,20 +1549,30 @@ main(void)
     /* Initialize the USART with 9600 baud rate, based on 36MHz PCLK1 */
     usart_init(USART2, 36 * 1000 * 1000, 9600);
 
-    /*
-     * Setup printer.
-     */
     /* Enable clock to the timer */
     RCC->apb1enr |= RCC_APB1ENR_TIM2EN_MASK;
-
     /* Enable timer interrupt */
-    NVIC->iser[NVIC_INT_TIM2 / 32] |= 1 << (NVIC_INT_TIM2 % 32);
+    nvic_int_set_enable(NVIC_INT_TIM2);
+
+    /* Initialize printer module */
+    printer_init(USART2, TIM2, 72000000);
 
     /*
-     * Setup printer with USART2 and
-     * TIM2 timer fed by doubled 36MHz APB1 clock
+     * Setup ZX Printer interface with GPIO_B for I/O and
+     * the motor-timing TIM3 fed by doubled 36MHz APB1 clock
      */
-    printer_init(USART2, TIM2, 72000000);
+    /* Enable clock to the timer */
+    RCC->apb1enr |= RCC_APB1ENR_TIM3EN_MASK;
+    /* Enable timer interrupt */
+    nvic_int_set_enable(NVIC_INT_TIM3);
+    /* Enable interrupt on both edges of the SELECT pin */
+    afio_exti_set_port(ZXPRINTER_PIN_SELECT, AFIO_EXTI_PORT_B);
+    EXTI->imr |= 1 << ZXPRINTER_PIN_SELECT;
+    EXTI->rtsr |= 1 << ZXPRINTER_PIN_SELECT;
+    EXTI->ftsr |= 1 << ZXPRINTER_PIN_SELECT;
+    nvic_int_set_enable_ext(ZXPRINTER_PIN_SELECT);
+    /* Initialize ZX Printer interface module */
+    zxprinter_init(GPIO_B, TIM3, 72000000);
 
     /*
      * Transmit test image

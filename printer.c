@@ -18,14 +18,10 @@ static volatile bool printer_busy = false;
 void
 printer_handler(void)
 {
-    /* Toggle debug pin */
-    GPIO_A->odr ^= GPIO_ODR_ODR7_MASK;
     if (printer_tim->sr & TIM_SR_CC1IF_MASK) {
         /* Free up the printer */
         printer_busy = false;
     }
-    /* Toggle debug pin */
-    GPIO_A->odr ^= GPIO_ODR_ODR7_MASK;
     /* Clear the interrupt flags */
     printer_tim->sr = 0;
 }
