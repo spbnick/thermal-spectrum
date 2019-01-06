@@ -1,0 +1,149 @@
+We want to react to the ZX Spectrum as fast as possible
+In the background we convert the received data and put it into the serial
+buffer
+
+We have interrupts tell us when we should handle ZX Spectrum
+
+We need to send initialization to the printer only after certain time has
+passed since reset.
+We need to be sending new lines to the printer after a specific time has
+elapsed since the previous time or since the initialization.
+We can have a timer interrupt calling printer service routine periodically to
+check if the time has elapsed. Or we can re-schedule a one-time timer every
+time we need to handle the printer and in the interrupt ask the DMA to send
+the line.
+
+We can have a fixed line buffer.
+
+We can have 1.5x scaling by doubling every other bit and line.
+
+We can wear our heater out more evenly, if we pick a random horizontal offset
+for our unscaled output after each reset.
+
+So, we can have bitmap conversion/scaling done in background, in the main
+thread, and have interrupts for data coming from the ZX Spectrum (GPIO pins),
+and for printer being ready (general-purpose timer).
+
+The Spectrum interrupt would interpret pin changes and write received data to
+a buffer, until it gets a full line. Then it would signal a line is ready.
+
+The printer interrupt would be set up to trigger when the printer is supposed
+to be ready, and would send the converted data to the printer. E.g. with DMA.
+Or it could signal the background, the main thread, to send it by itself.
+
+So, to have faster bus driving, we need to have a hardware driver and only
+have the MCU update the state in the driver and receive the data from the
+driver. Oh well, we'll probably need another breadboard for this. The MCU
+could keep the current state on its output pins and the bus driver would
+update its state whenever it is not being queried by the bus. So we won't need
+an interrupt for producing output, we just need to make sure we update all the
+outputs at once, which should be possible to do by using a single port for all
+the outputs.
+
+Regarding the input, the bus driver should produce an interrupt when new input
+is available and then the MCU should sample those inputs on its input pins
+within a specific amount of time, which would be less than it's possible for
+spectrum to write another state. The bus driver could also take care of
+latching the output values until another write is done. We can probably have
+an interrupt attached to the SELECT & !RD signal, which would need another
+logic gate.
+
+We could probably use one three-state buffer for the output and one basic
+buffer for the input, or just two three-state buffers to minimize the
+component variety. We don't need big buffers, we only have three inputs and
+three outputs, so if we could have a single chip with two separate latches for
+two pin groups, that would be good.
+
+We latch the written data to the buffer on SELECT & WR signal, and it stays
+always present on the lines going to the MCU. However, the MCU ignores it
+until the first write (i.e. SELECT & WR) interrupt is detected.
+
+We latch the read data to the buffer from the MCU pins on SELECT & WR signal,
+again, as described in the manual ("D0 and D7 are both latched so that they
+remain high until the computer writes something to the printer"). Except we
+need to have D6 (presence) to be always low, when the printer is ready, when
+driving the bus.
+
+So, we need to preload the values to the output register, so the first read
+produces something sensible. We also need to make sure that the interface
+powers up with something sensible as well. Maybe we can disable output's OE
+until we're ready. We can preload values by disabling the input's OE, driving
+the lines we care about and triggering output's LE.
+
+What if we initially have both input and output register's ~OE disabled
+(high), and only enable them after we're done initializing and wrote something
+sensible to the output register? We would only sample the inputs on an
+interrupt triggered by a device write, which would only be enabled after we're
+ready.
+
+So the MCU needs the following lines:
+
+* OUTPUT_LE     - to load the output register with the initial values
+* ~READY        - pulled high with a resistor, to pull low when ready, which
+                  would enable both input and output
+* DEVICE_WR     - to trigger a write interrupt and sample the latched inputs
+* STYLUS        - to sample the "stylus power" input
+* PAPER         - to signal "paper detected" state
+* ENCODER       - to signal the "encoder" state
+* MOTOR_SLOW    - to initially signal and then sample the "motor slow" state
+* MOTOR_STOP    - to initially signal and then sample the "motor stop" state
+
+Ah, wait, we need the ENCODER and PAPER signals to be able to go down only
+when a write is happening. So we need to have some sort of flip-flop, which
+can only be set to one, normally, and would accept zero only in the presence
+of another signal.
+
+I.e. if A is the input, and C is that control signal, Q is the current state,
+and Q' is the next state:
+
+A   C   Q   Q'
+0   0   0   0
+0   0   1   1
+0   1   0   0
+0   1   1   0
+1   0   0   1
+1   0   1   1
+1   1   0   1
+1   1   1   1
+
+Or:
+
+Q' = (C & A) | (~C & (Q | A)) = C&A | ~C&Q | ~C&A = ~C & Q | A
+
+With NOR gates:
+
+Q' = ~~(~(C | ~Q) | A)
+
+With NAND gates:
+
+Q' = ~(~(~C & Q) & ~A)
+
+Now, how do we initialize the MOTOR_SLOW/MOTOR_STOP/STYLUS inputs?
+Let's say X is the initializing MCU input, Y is the bus input, and C is the
+control input, meaning zero for the X input and one for the Y input, and Q is
+the output going to the latch. Then
+
+Q = X & ~C | Y & C
+
+With NAND gates:
+
+Q = ~(~(X & ~C) & ~(Y & C))
+
+And that's for every input, which is a lot. Can we just try to live with the
+non-initialized inputs? Assuming that the latch initializes to zero, that
+would be motor is on full-speed at the start, but the stylus is off. We can
+initialize the MCU from that instead and let the host do its own
+initialization, or rather we shouldn't try to interpret anything until the
+first write.
+
+So, after refining, here are the MCU signals:
+
+* READY         - pulled low with a resistor, to pull high when ready, which
+                  would allow output to react to DEVICE_RD
+* DEVICE_WR     - to trigger a write interrupt and sample the latched inputs
+* STYLUS        - to sample the "stylus power" input
+* PAPER         - to signal "paper detected" state
+* ENCODER       - to signal the "encoder" state
+* MOTOR_SLOW    - to sample the "motor slow" state
+* MOTOR_STOP    - to sample the "motor stop" state
+
