@@ -32,9 +32,9 @@ tim3_irq_handler(void)
 void
 exti_handler(void)
 {
-    GPIO_A->odr = (GPIO_A->odr & ~(1 << 7)) |
-                  (((GPIO_B->idr & (1 << ZXPRINTER_PIN_SELECT)) >> ZXPRINTER_PIN_SELECT) << 7);
-    EXTI->pr |= (1 << ZXPRINTER_PIN_SELECT);
+    zxprinter_write_handler();
+    /* Clear the interrupt */
+    EXTI->pr |= (1 << ZXPRINTER_PIN_WRITE);
 }
 
 #define EXTI_IRQ_HANDLER(_name) \
@@ -53,6 +53,7 @@ EXTI_IRQ_HANDLER(exti4_irq_handler);
 EXTI_IRQ_HANDLER(exti9_5_irq_handler);
 EXTI_IRQ_HANDLER(exti15_10_irq_handler);
 
+#if 0
 static const uint8_t TEST_IMAGE[][384 / 8] = {
     {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
      0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -1495,6 +1496,7 @@ static const uint8_t TEST_IMAGE[][384 / 8] = {
      0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
      0xFF, 0xFF, 0xFF, 0xFF},
 };
+#endif
 
 int
 main(void)
@@ -1563,23 +1565,24 @@ main(void)
      */
     /* Enable clock to the timer */
     RCC->apb1enr |= RCC_APB1ENR_TIM3EN_MASK;
-    /* Enable timer interrupt */
-    nvic_int_set_enable(NVIC_INT_TIM3);
-    /* Enable interrupt on both edges of the SELECT pin */
-    afio_exti_set_port(ZXPRINTER_PIN_SELECT, AFIO_EXTI_PORT_B);
-    EXTI->imr |= 1 << ZXPRINTER_PIN_SELECT;
-    EXTI->rtsr |= 1 << ZXPRINTER_PIN_SELECT;
-    EXTI->ftsr |= 1 << ZXPRINTER_PIN_SELECT;
-    nvic_int_set_enable_ext(ZXPRINTER_PIN_SELECT);
     /* Initialize ZX Printer interface module */
     zxprinter_init(GPIO_B, TIM3, 72000000);
+    /* Enable timer interrupt */
+    nvic_int_set_enable(NVIC_INT_TIM3);
+    /* Enable interrupt on the rising edge of the WRITE pin */
+    afio_exti_set_port(ZXPRINTER_PIN_WRITE, AFIO_EXTI_PORT_B);
+    EXTI->imr |= 1 << ZXPRINTER_PIN_WRITE;
+    EXTI->rtsr |= 1 << ZXPRINTER_PIN_WRITE;
+    nvic_int_set_enable_ext(ZXPRINTER_PIN_WRITE);
 
+#if 0
     /*
      * Transmit test image
      */
     for (size_t i = 0; i < ARRAY_SIZE(TEST_IMAGE); i++) {
         printer_print_line(TEST_IMAGE[i]);
     }
+#endif
 
     /* Stop */
     do {

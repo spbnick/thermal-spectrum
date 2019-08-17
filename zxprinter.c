@@ -29,130 +29,106 @@ static volatile struct tim *zxprinter_tim = NULL;
              ZXPRINTER_ENCODER_PULSES_OFF_PAPER)
 
 /*
- * Read and written by the motor timer, read by the interface and users
+ * Only used by timer handler.
  */
 /** Encoder state, zero or one */
-static volatile uint8_t zxprinter_encoder_state = 0;
+static volatile uint8_t zxprinter_encoder_state;
 /** Encoder pulse number, zero to ZXPRINTER_ENCODER_PULSES_TOTAL - 1 */
-static volatile uint32_t zxprinter_encoder_pulse_num = 0;
-/** Number of lines printed */
-volatile uint32_t zxprinter_line_count = 0;
+static volatile uint32_t zxprinter_encoder_pulse_num;
 /** Paper-touching state, zero or one */
-static volatile uint8_t zxprinter_paper_state = 1;
+static volatile uint8_t zxprinter_paper_state;
 
 /*
- * Read and written by the interface, read by users
+ * Read and written by timer handler, read by users.
  */
-/** Latched (output) paper-touching state, zero or one */
-static uint8_t zxprinter_latched_paper_state = 0;
-/** Latched (output) encoder state, zero or one */
-static uint8_t zxprinter_latched_encoder_state = 0;
+/** Number of lines printed */
+volatile uint32_t zxprinter_line_count = 0;
 /** Line buffer */
 volatile uint8_t zxprinter_line_buf[ZXPRINTER_LINE_LEN / 8];
 
 void
 zxprinter_tim_handler(void)
 {
-    if (zxprinter_encoder_state ^= 1) {
-        if (zxprinter_encoder_pulse_num < ZXPRINTER_ENCODER_PULSES_TOTAL) {
+    /* Update encoder state */
+    zxprinter_encoder_state ^= 1;
+
+    /* If we're turning encoder signal on */
+    if (zxprinter_encoder_state) {
+        /* If we finished one stylus cycle */
+        if (zxprinter_encoder_pulse_num >= ZXPRINTER_ENCODER_PULSES_TOTAL) {
+            zxprinter_encoder_pulse_num = 0;
+            zxprinter_paper_state = 1;
+        /* Else, we're in a stylus cycle */
+        } else {
             zxprinter_encoder_pulse_num++;
-            if (zxprinter_encoder_pulse_num ==
+            /* If stylus travelled off paper */
+            if (zxprinter_encoder_pulse_num >=
                 ZXPRINTER_ENCODER_PULSES_ON_PAPER) {
                 zxprinter_paper_state = 0;
                 zxprinter_line_count++;
             }
-        } else {
-            zxprinter_encoder_pulse_num = 0;
-            zxprinter_paper_state = 1;
+        }
+    /* Else we're turning it off */
+    } else {
+        /* If the stylus is on paper */
+        if (zxprinter_paper_state) {
+            uint8_t byte = zxprinter_encoder_pulse_num >> 3;
+            uint8_t bit = 7 - (zxprinter_encoder_pulse_num & 0x7);
+            uint8_t dot = ((zxprinter_gpio->idr >>
+                            ZXPRINTER_PIN_DOT_LATCH) & 1);
+            /* Record dot state */
+            zxprinter_line_buf[byte] =
+                (zxprinter_line_buf[byte] & ~(1 << bit)) |
+                (dot << bit);
         }
     }
+
+    /* Update outputs */
+    zxprinter_gpio->odr = (zxprinter_gpio->odr &
+                           ~((1U << ZXPRINTER_PIN_PAPER) |
+                             (1U << ZXPRINTER_PIN_ENCODER))) |
+                          (zxprinter_paper_state << ZXPRINTER_PIN_PAPER) |
+                          (zxprinter_encoder_state << ZXPRINTER_PIN_ENCODER);
+
     /* Clear the interrupt flags */
     zxprinter_tim->sr = 0;
 }
 
 void
-zxprinter_select_handler(void)
+zxprinter_write_handler(void)
 {
+    /* Read the written value */
     uint16_t pins = zxprinter_gpio->idr;
 
-    /* Update debug pin */
-    gpio_pin_set(GPIO_A, 7, pins & (1 << ZXPRINTER_PIN_SELECT));
-    /* If the interface is addressed */
-    if (pins & (1 << ZXPRINTER_PIN_SELECT)) {
-        /* If interface is being read */
-        if (pins & (1 << ZXPRINTER_PIN_RD)) {
-            zxprinter_latched_encoder_state |= zxprinter_encoder_state;
-            zxprinter_latched_paper_state |= zxprinter_paper_state;
-#if 0
-            zxprinter_gpio->odr =
-                (zxprinter_latched_encoder_state << ZXPRINTER_PIN_ENCODER) |
-                (zxprinter_latched_paper_state << ZXPRINTER_PIN_PAPER_STYLUS);
-
-            gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_ENCODER,
-                          GPIO_MODE_OUTPUT_50MHZ,
-                          GPIO_CNF_OUTPUT_GP_PUSH_PULL);
-            gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_NOT_PRESENT,
-                          GPIO_MODE_OUTPUT_50MHZ,
-                          GPIO_CNF_OUTPUT_GP_PUSH_PULL);
-            gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_PAPER_STYLUS,
-                          GPIO_MODE_OUTPUT_50MHZ,
-                          GPIO_CNF_OUTPUT_GP_PUSH_PULL);
-#endif
-        /* Else the interface is being written */
-        } else {
-            /* If the stylus is on paper and against a dot */
-            if (zxprinter_paper_state & zxprinter_encoder_state) {
-                /* Record the dot state */
-                uint8_t byte = zxprinter_encoder_pulse_num >> 3;
-                uint8_t bit = 7 - (zxprinter_encoder_pulse_num & 0x7);
-                zxprinter_line_buf[byte] =
-                    (zxprinter_line_buf[byte] & ~(1 << bit)) |
-                    (((pins >> ZXPRINTER_PIN_PAPER_STYLUS) & 1) << bit);
-            }
-            /* If motor is turned off */
-            if (pins & (1 << ZXPRINTER_PIN_MOTOR_OFF)) {
-                /* Stop counting */
-                zxprinter_tim->cr1 &= ~TIM_CR1_CEN_MASK;
-            /* Else the motor is turned on */
-            } else {
-                uint16_t curr_arr = zxprinter_tim->arr;
-                uint16_t new_arr;
-                /* If motor is set to slow speed */
-                if (pins & (1 << ZXPRINTER_PIN_MOTOR_SLOW)) {
-                    /* Set double timer period */
-                    new_arr = ZXPRINTER_ENCODER_TIM_SLOW_PERIOD_US;
-                /* Else motor is set to normal speed */
-                } else {
-                    /* Set normal timer period */
-                    new_arr = ZXPRINTER_ENCODER_TIM_NORMAL_PERIOD_US;
-                }
-                /* Update timer if necessary */
-                if (new_arr != curr_arr) {
-                    zxprinter_tim->arr = new_arr;
-                    /* If timer is not counting */
-                    if (!(zxprinter_tim->cr1 & TIM_CR1_CEN_MASK)) {
-                        /* Ask to transfer data to shadow registers */
-                        zxprinter_tim->egr |= TIM_EGR_UG_MASK;
-                        /* Start counting */
-                        zxprinter_tim->cr1 |= TIM_CR1_CEN_MASK;
-                    }
-                }
-            }
-            /* Clear the latches */
-            zxprinter_latched_encoder_state = 0;
-            zxprinter_latched_paper_state = 0;
-        }
-    /* Else the interface is not addressed */
+    /* If motor is turned off */
+    if (pins & (1U << ZXPRINTER_PIN_MOTOR_OFF)) {
+        /* Stop counting */
+        zxprinter_tim->cr1 &= ~TIM_CR1_CEN_MASK;
+    /* Else the motor is turned on */
     } else {
-#if 0
-        /* Put all output pins in high-impedance state */
-        gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_ENCODER,
-                      GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOATING);
-        gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_NOT_PRESENT,
-                      GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOATING);
-        gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_PAPER_STYLUS,
-                      GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOATING);
-#endif
+        uint16_t curr_arr = zxprinter_tim->arr;
+        uint16_t new_arr;
+        /* If motor is set to slow speed */
+        if (pins & (1U << ZXPRINTER_PIN_MOTOR_SLOW)) {
+            /* Set double timer period */
+            new_arr = ZXPRINTER_ENCODER_TIM_SLOW_PERIOD_US;
+        /* Else motor is set to normal speed */
+        } else {
+            /* Set normal timer period */
+            new_arr = ZXPRINTER_ENCODER_TIM_NORMAL_PERIOD_US;
+        }
+        /* If "motor speed" changed */
+        if (new_arr != curr_arr) {
+            /* Update period */
+            zxprinter_tim->arr = new_arr;
+        }
+        /* If "motor" was off */
+        if (!(zxprinter_tim->cr1 & TIM_CR1_CEN_MASK)) {
+            /* Ask to transfer data to shadow registers */
+            zxprinter_tim->egr |= TIM_EGR_UG_MASK;
+            /* Start counting */
+            zxprinter_tim->cr1 |= TIM_CR1_CEN_MASK;
+        }
     }
 }
 
@@ -166,22 +142,23 @@ zxprinter_init(volatile struct gpio *gpio,
      */
     zxprinter_gpio = gpio;
     zxprinter_tim = tim;
+    zxprinter_encoder_pulse_num = 0;
+    zxprinter_encoder_state = 1;
+    zxprinter_paper_state = 1;
 
     /*
      * Setup the I/O pins
      */
-    /* Put all output pins in high-impedance state */
+    gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_READY,
+                  GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_GP_PUSH_PULL);
+    gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_WRITE,
+                  GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOATING);
+    gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_DOT_LATCH,
+                  GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOATING);
+    gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_PAPER,
+                  GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_GP_PUSH_PULL);
     gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_ENCODER,
-                  GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOATING);
-    gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_NOT_PRESENT,
-                  GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOATING);
-    gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_PAPER_STYLUS,
-                  GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOATING);
-    /* Configure all input pins */
-    gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_SELECT,
-                  GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOATING);
-    gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_RD,
-                  GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOATING);
+                  GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_GP_PUSH_PULL);
     gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_MOTOR_SLOW,
                   GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOATING);
     gpio_pin_conf(zxprinter_gpio, ZXPRINTER_PIN_MOTOR_OFF,
@@ -199,12 +176,12 @@ zxprinter_init(volatile struct gpio *gpio,
     /* Enable Capture/Compare 1 interrupt */
     zxprinter_tim->dier |= TIM_DIER_CC1IE_MASK;
 
-#if 0
-    /* Set timer period */
-    zxprinter_tim->arr = ZXPRINTER_ENCODER_TIM_NORMAL_PERIOD_US;
-    /* Ask to transfer data to shadow registers */
-    zxprinter_tim->egr |= TIM_EGR_UG_MASK;
-    /* Start counting */
-    zxprinter_tim->cr1 |= TIM_CR1_CEN_MASK;
-#endif
+    /* Set initial paper state */
+    gpio_pin_set(zxprinter_gpio, ZXPRINTER_PIN_PAPER,
+                 zxprinter_paper_state);
+    /* Set initial encoder state */
+    gpio_pin_set(zxprinter_gpio, ZXPRINTER_PIN_ENCODER,
+                 zxprinter_encoder_state);
+    /* Signal printer interface is ready */
+    gpio_pin_set(zxprinter_gpio, ZXPRINTER_PIN_READY, 1);
 }

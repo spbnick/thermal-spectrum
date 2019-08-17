@@ -147,3 +147,120 @@ So, after refining, here are the MCU signals:
 * MOTOR_SLOW    - to sample the "motor slow" state
 * MOTOR_STOP    - to sample the "motor stop" state
 
+OK, let's rename MOTOR_STOP to MOTOR_OFF, as it is level-triggered.
+
+So, our job is to update PAPER and ENCODER based on the MOTOR_OFF and
+MOTOR_SLOW. As well as record a dot each period PAPER && ENCODER are true. We
+can record the dot when PAPER && ENCODER && !MOTOR_OFF go from true to false.
+And the value of the dot would be on if it was ever on during that period
+
+OK, interrupt latency brings another problem: the host writes the stylus state
+to the port when it thinks that the encoder signal is high. However, by the
+time the MCU reads the stylus state and checks the encoder and paper state,
+the two latter might have changed, invalidating host input. We latch the host
+input in the input latch, at the time of writing, but we don't latch the
+encoder state. We need to capture that as well. We have extra pins on the
+input latch and we can use that. We can also e.g. have an ADC sample and store
+the state of the stylus signal for us at the time of write, but that would be
+just emulating a latch.
+
+Could we maybe use a similar latch we've built for PAPER and ENCODER signals?
+How does it even work in the original, or how could it work? The service
+manual says that the encoder&paper signal is used as the clock for the buffer,
+but it doesn't say if the clock makes the buffer store the input on an edge or
+on a level. Given that the computer is reacting to the encoder signal and that
+it will always be late for the rising edge, the buffer must store on the high
+level or on the falling edge.
+
+What if instead updating the stylus state in the write handler, we simply
+sampled the stylus pin on the falling edge of the encoder in the timer
+handler? That might work.
+
+An alternative could be to make a latch that would latch high, and only allow
+itself to go down when the encoder signal is low. That would be similar to
+what we do with the paper and encoder signals, for the host. Or rather, that
+doesn't have to be an alternative, but an addition to the above. That would
+let us have the stylus capture at the time the encoder is high, while not
+requiring an internal state update in the write handler.
+
+We won't even need a "dot state" and a "stylus state" variables, we would be
+able to just sample that latch when the encoder signal goes down. That would
+simplify interrupt handling even further! Then the write handler would only
+need to take care of controlling the "motor"!
+
+So, what would that latch look like?
+
+STYLUS  ENC     DOT     DOT'
+0       0       0       0
+0       0       1       0
+0       1       0       0
+0       1       1       1
+1       0       0       1
+1       0       1       1
+1       1       0       1
+1       1       1       1
+
+Thus:
+
+DOT' = (!ENC & STYLUS) | (ENC & (DOT | STYLUS)) =
+= !ENC & STYLUS | ENC & DOT | ENC & STYLUS = STYLUS | ENC & DOT
+
+Waait, we don't operate on just encoder here, it should be ENCODER & PAPER.
+So it becomes:
+
+DOT' = STYLUS | (ENCODER & PAPER) & DOT
+
+And now we have to redo our PAPER and ENCODER latches to provide that ENCODER &
+PAPER signal.
+
+With NOR gates:
+
+DOT' = !!(STYLUS | !(!(ENCODER & PAPER) | !DOT))
+
+With NAND gates:
+
+DOT' = !(!STYLUS & !((ENCODER & PAPER) & DOT))
+
+If we use a NAND gate to get an !ENCODER_PAPER signal from ENCODER and PAPER,
+and we use !DOT instead of DOT, then we can write it this way:
+
+!DOT' = !(STYLUS | !(!ENCODER_PAPER | !DOT))
+
+Or we can designate the signal fully as DOT_LATCH, so:
+
+!DOT_LATCH' = !(STYLUS | !(!ENCODER_PAPER | !DOT_LATCH))
+
+Let's try to minimize the number of gates for ENCODER_PAPER_LATCH, which is
+fed !ENCODER_PAPER and WRITE signals.
+
+ENCODER_PAPER_LATCH' = !WRITE & ENCODER_PAPER_LATCH | !NOT_ENCODER_PAPER
+
+ENCODER_PAPER_LATCH' = !!(!WRITE & ENCODER_PAPER_LATCH) | !NOT_ENCODER_PAPER
+
+With two NAND gates and one invertor:
+ENCODER_PAPER_LATCH' = !(!(!WRITE & ENCODER_PAPER_LATCH) & NOT_ENCODER_PAPER)
+or, for clarity:
+ENCODER_PAPER_LATCH' = !(!(!WRITE & ENCODER_PAPER_LATCH) & (!ENCODER_PAPER))
+
+And a truth table to check:
+ENCODER_PAPER   WRITE   ENCODER_PAPER_LATCH     ENCODER_PAPER_LATCH'
+0               0       0                       0
+0               0       1                       1
+0               1       0                       0
+0               1       1                       0
+1               0       0                       1
+1               0       1                       1
+1               1       0                       1
+1               1       1                       1
+
+Seems correct! One less gate compared to NOR gates
+
+ENCODER_PAPER_LATCH' = !(!(NOT_WRITE & ENCODER_PAPER_LATCH) & NOT_ENCODER_PAPER)
+
+OK, after further experiments and reading the ROM disassembly more carefully,
+it seems that bits zero and seven, ENCODER_PAPER_LATCH and PAPER_LATCH should
+be set to zero on every write regardless of the state of the encoder or paper.
+I.e. the host doesn't wait for the ENCODER_PAPER_LATCH to go zero and then
+back to one, it simply waits for it to be one before outputting a dot. We need
+to redo our logic to have those reset on write, and set on rising edge of
+ENCODER_PAPER and PAPER signal respectively.
