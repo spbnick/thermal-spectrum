@@ -30,8 +30,6 @@ enum zxprinter_pin {
 /** Number of dots on a line */
 #define ZXPRINTER_LINE_LEN  256
 
-/** Line buffer */
-extern volatile uint8_t zxprinter_line_buf[ZXPRINTER_LINE_LEN / 8];
 /** Number of lines printed */
 extern volatile uint32_t zxprinter_line_count;
 
@@ -49,10 +47,12 @@ extern volatile uint32_t zxprinter_line_count;
  *                  be called for the specified timer's interrupts, after
  *                  zxprinter_init() completed.
  * @param ck_int    Frequency of the clock fed to the timer (CK_INT).
+ * @param line_buf  Pointer to the buffer to output input lines to.
  */
 extern void zxprinter_init(volatile struct gpio *gpio,
                            volatile struct tim *tim,
-                           uint32_t ck_int);
+                           uint32_t ck_int,
+                           volatile uint8_t *line_buf);
 
 /**
  * ZX Printer interface timer interrupt handler.

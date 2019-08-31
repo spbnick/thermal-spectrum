@@ -1501,6 +1501,8 @@ static const uint8_t TEST_IMAGE[][384 / 8] = {
 int
 main(void)
 {
+    /* Output line buffer */
+    volatile uint8_t line_buf[48] = {0,};
     /* Basic init */
     init();
 
@@ -1566,7 +1568,7 @@ main(void)
     /* Enable clock to the timer */
     RCC->apb1enr |= RCC_APB1ENR_TIM3EN_MASK;
     /* Initialize ZX Printer interface module */
-    zxprinter_init(GPIO_B, TIM3, 72000000);
+    zxprinter_init(GPIO_B, TIM3, 72000000, line_buf);
     /* Enable timer interrupt */
     nvic_int_set_enable(NVIC_INT_TIM3);
     /* Enable interrupt on the rising edge of the WRITE pin */

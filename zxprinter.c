@@ -95,7 +95,7 @@ zxprinter_cycle_is_on_line(void)
 /** Number of lines printed */
 volatile uint32_t zxprinter_line_count = 0;
 /** Line buffer */
-volatile uint8_t zxprinter_line_buf[ZXPRINTER_LINE_LEN / 8];
+static volatile uint8_t *zxprinter_line_buf;
 
 void
 zxprinter_tim_handler(void)
@@ -198,13 +198,15 @@ zxprinter_write_handler(void)
 void
 zxprinter_init(volatile struct gpio *gpio,
                volatile struct tim *tim,
-               uint32_t ck_int)
+               uint32_t ck_int,
+               volatile uint8_t *line_buf)
 {
     /*
      * Initialize the variables
      */
     zxprinter_gpio = gpio;
     zxprinter_tim = tim;
+    zxprinter_line_buf = line_buf;
     /* Start in the air */
     zxprinter_clock_state = 0;
     zxprinter_cycle_step = ZXPRINTER_CYCLE_STEPS;
