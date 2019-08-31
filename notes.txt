@@ -264,3 +264,161 @@ I.e. the host doesn't wait for the ENCODER_PAPER_LATCH to go zero and then
 back to one, it simply waits for it to be one before outputting a dot. We need
 to redo our logic to have those reset on write, and set on rising edge of
 ENCODER_PAPER and PAPER signal respectively.
+
+----
+
+So, we can keep emulating the original timing, i.e. speed of the printer, but
+we still need to latch the value written. I.e. the MOTOR_SLOW, MOTOR_OFF, and
+the STYLUS. We need to simply latch the encoder and paper signals high with
+the timer, and reset them to zero with the write signal.
+
+So, signal-by-signal:
+
+D0  - reads PAPER & ENCODER. Latched high by timer, reset by WRITE
+D6  - reads !READY
+D7  - reads PAPER | STYLUS. PAPER is latched high by timer, reset by WRITE
+
+D2  - high level written stops the motor timer, low level starts it, motor is
+      stopped on power-on
+D1  - high level written means slow motor timer, low level means normal motor
+      timer, normal speed on power-on
+D7  - stylus power on, remains latched, low on power-on
+
+How do we make sure the MCU gets the right value of the dot by the time it
+responds to the interrupt?
+The host never actually knows what the current status of the encoder and paper
+is. Neither does the original printer care about it, because it has a line
+buffer. What we should only care about is only raising the encoder pin when we
+actually processed the previous write by remembering the dot value. We can
+take as long as we want to remember it, as long as we don't raise the
+encoder&paper pin high before we're done and ready to receive the next one.
+The host is not supposed to write any dot values while that is low, so we
+don't have to respond to those writes at all.
+
+Should we maybe ignore dot changes when the PAPER & ENCODER latch is low? Yes,
+if only to ignore e.g. the instruction to start or to stop the motor.
+
+Actually, it's the other way around. Once the motor (timer) is started, for
+each PAPER&ENCODER signal going down, we should sample the latest value of
+STYLUS and record it.
+
+The interface should simply record the STYLUS value.
+
+D0_ENCODER = LATCHED(PAPER&ENCODER)
+D6_PRESENT = !READY
+D7_STYLUS_PAPER = STYLUS | LATCHED(PAPER)
+
+For these latches we need the following logic:
+set only on the rising edge (of PAPER&ENCODER or just PAPER), reset only when
+WRITE is high (the level or either edge is fine), and if both are high, then
+reset.
+
+So, let's say the input (PAPER&ENCODER or PAPER) is S, the reset signal is R,
+the current output is O, and the next output is O'. Then:
+
+I   R   O   O'
+
+0   0   0   0
+0   0   1   1
+0   1   0   0
+0   1   1   0
+1   0   0   1
+
+Wait, we should simply not set ENCODER output high until we finished recording
+the write. Ah, but what if the timer interrupt raced the WRITE interrupt?
+
+Wait, let's try setting the signals on rising edge only again.
+
+I.e. we need a latch, which can be set by a rising edge of the input, and
+reset by a rising edge of the write signal.
+
+
+'I  I   'R  R   'O  O
+0   0   0   0   0   0
+0   0   0   0   1   1
+0   0   0   1   0   0
+0   0   0   1   1   0
+0   0   1   0   0   0
+0   0   1   0   1   1
+0   0   1   1   0   0
+0   0   1   1   1   1
+0   1   0   0   0   1
+0   1   0   0   1   1
+0   1   0   1   0   1   Input wins over reset!
+0   1   0   1   1   1   Input wins over reset!
+0   1   1   0   0   1
+0   1   1   0   1   1
+0   1   1   1   0   1
+0   1   1   1   1   1
+1   0   0   0   0   0
+1   0   0   0   1   1
+1   0   0   1   0   0
+1   0   0   1   1   0
+1   0   1   0   0   0
+1   0   1   0   1   1
+1   0   1   1   0   0
+1   0   1   1   1   1
+1   1   0   0   0   0
+1   1   0   0   1   1
+1   1   0   1   0   0
+1   1   0   1   1   0
+1   1   1   0   0   0
+1   1   1   0   1   1
+1   1   1   1   0   0
+1   1   1   1   1   1
+
+If we say that IU and RU are input-up and reset-up conditions, then we can
+write this shorter:
+
+IU  RU  'O  O
+0   0   0   0
+0   0   1   1
+0   1   0   0
+0   1   1   0
+1   0   0   1
+1   0   1   1
+1   1   0   1   Input wins over reset!
+1   1   1   1   Input wins over reset!
+
+OK, this might get complicated quickly. Are we sure we can't do it with
+levels? Since we get a conflict anyway? How about, if we have both reset and
+input set, input wins and that's it?
+
+So:
+
+I   R   'O  O
+0   0   0   0
+0   0   1   1
+0   1   0   0
+0   1   1   0
+1   0   0   1
+1   0   1   1
+1   1   0   1   Input wins over reset!
+1   1   1   1   Input wins over reset!
+
+Wait, no, in this case we should have reset win over input. And then we're
+back to the situation that when reset is deasserted, input affects the output
+again, and that's not what we need. We need a write to clear current input
+event, so that the host can wait for another. That's why we introduced
+edge-triggered latching above.
+
+However, we might not have parts for implementing edge triggering, and
+it would take a lot of basic logic gates to construct one, and we need two.
+We have a lot of outputs from the MCU, though. Can we simplify the logic if we
+had pulse outputs for bringing the PAPER and ENCODER signals up and down, and
+guarantee the counterparts can never be asserted together?
+
+I still can't believe we need to be this complex...
+
+Wait, do we ever need to reset the PAPER and ENCODER signals ourselves? No,
+both of them are to be reset by the host. So we can simply make them
+pulse-set, and have the pulse win over the write-high. Or maybe make them
+edge-triggered after all. Can we maybe abuse some of the MCU circuitry to make
+the edge-triggered output?
+
+Or maybe we could just buy edge-triggered flip-flops, like 74LS175.
+
+Or, could we simply clear the outputs on detecting the write signal in the
+MCU? We should be able to outrun the host issuing a follow-up read, won't we?
+Sounds good. We won't have the learning opportunity, but we could save time
+and money on building the necessary circuit.

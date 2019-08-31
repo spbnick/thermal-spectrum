@@ -15,8 +15,8 @@ enum zxprinter_pin {
     ZXPRINTER_PIN_READY         = 7,
     /* Reads high when printer device is being written to */
     ZXPRINTER_PIN_WRITE         = 8,
-    /* Reads high, if the last dot had the stylus on  */
-    ZXPRINTER_PIN_DOT_LATCH     = 9,
+    /* Reads high, if the power should be applied to the stylus */
+    ZXPRINTER_PIN_STYLUS        = 9,
     /* Written high when a stylus is on paper, low otherwise */
     ZXPRINTER_PIN_PAPER         = 12,
     /* Written high when a dot could be printed, low otherwise */
