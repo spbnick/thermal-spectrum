@@ -30,8 +30,10 @@ enum zxprinter_pin {
 /** Number of dots on a line */
 #define ZXPRINTER_LINE_LEN  256
 
-/** Number of lines printed */
-extern volatile uint32_t zxprinter_line_count;
+/** Number of lines input, updated by the interface */
+extern volatile uint32_t zxprinter_line_count_in;
+/** Number of lines output, read by the interface */
+extern volatile uint32_t zxprinter_line_count_out;
 
 /**
  * Initialize the ZX Printer interface.

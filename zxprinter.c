@@ -12,7 +12,7 @@ static volatile struct gpio *zxprinter_gpio = NULL;
 static volatile struct tim *zxprinter_tim = NULL;
 
 /*
- * Cycle structure, based on ZX Printer instructions
+ * Cycle structure, full speed, based on "ZX Printer instructions"
  *
  * UNIT     |                  SINGLE STYLUS CYCLE                   | TOTAL
  *          |                                                        |
@@ -20,7 +20,7 @@ static volatile struct tim *zxprinter_tim = NULL;
  *          |                                         |              |
  *          |MARGIN|            LINE           |MARGIN|              |
  * ---------+------+---------------------------+------+--------------|
- * mm       |  4   |             84            |  4   |      46      | 138
+ * mm       |  4   |             92            |  4   |      50      | 150
  * ms       |  1.4 |             29.2          |  1.4 |      16      |  48
  * steps    | 12   |            256            | 12   |     140      | 420
  *
@@ -50,103 +50,151 @@ static volatile struct tim *zxprinter_tim = NULL;
 #define ZXPRINTER_CYCLE_STEP_PERIOD_US \
             (ZXPRINTER_CYCLE_MS * 1000 / ZXPRINTER_CYCLE_STEPS)
 
-/** Normal timer period, microseconds */
-#define ZXPRINTER_TIM_NORMAL_PERIOD_US \
-    (ZXPRINTER_CYCLE_STEP_PERIOD_US / 2)
-/** Slow timer period, microseconds */
-#define ZXPRINTER_TIM_SLOW_PERIOD_US \
-    (ZXPRINTER_TIM_NORMAL_PERIOD_US * 2)
-
 /*
  * Only used by timer handler.
  */
-/** Clock state, zero or one */
-static volatile uint8_t zxprinter_clock_state;
+/** Clock step */
+static volatile uint32_t zxprinter_clock_step;
+/** Clock level */
+static volatile uint32_t zxprinter_clock_level;
 /** Single stylus cycle step number, zero to ZXPRINTER_CYCLE_STEPS */
 static volatile uint32_t zxprinter_cycle_step;
 
 /**
- * Check if the stylus is on paper.
+ * Check if a stylus step is on paper.
+ *
+ * @param step  The stylus step in the cycle.
  *
  * @return One if the stylus is on paper, zero otherwise.
  */
 static unsigned int
-zxprinter_cycle_is_on_paper(void)
+zxprinter_cycle_is_on_paper(uint32_t step)
 {
-    return zxprinter_cycle_step < ZXPRINTER_CYCLE_PAPER_STEPS;
+    return step < ZXPRINTER_CYCLE_PAPER_STEPS;
 }
 
 /**
- * Check if the stylus is on the printable line.
+ * Check if a stylus step is on the printable line.
+ *
+ * @param step  The stylus step in the cycle.
  *
  * @return One if the stylus is on the line, zero otherwise.
  */
 static unsigned int
-zxprinter_cycle_is_on_line(void)
+zxprinter_cycle_is_on_line(uint32_t step)
 {
-    uint32_t step = zxprinter_cycle_step;
     return step >= ZXPRINTER_CYCLE_MARGIN_STEPS &&
            step < (ZXPRINTER_CYCLE_MARGIN_STEPS + ZXPRINTER_CYCLE_LINE_STEPS);
+}
+
+/**
+ * Check if a stylus step is at the end of the cycle.
+ *
+ * @param step  The stylus step in the cycle.
+ *
+ * @return One if the stylus cycle is done, zero otherwise.
+ */
+static unsigned int
+zxprinter_cycle_is_finished(uint32_t step)
+{
+    return step >= ZXPRINTER_CYCLE_STEPS;
 }
 
 /*
  * Read and written by timer handler, read by users.
  */
-/** Number of lines printed */
-volatile uint32_t zxprinter_line_count = 0;
+/** Number of lines input */
+volatile uint32_t zxprinter_line_count_in;
+/*
+ * Read by timer handler, read and written by users.
+ */
+/** Number of lines output */
+volatile uint32_t zxprinter_line_count_out;
+
+/*
+ * Written on init, used by timer handler.
+ */
 /** Line buffer */
 static volatile uint8_t *zxprinter_line_buf;
 
 void
 zxprinter_tim_handler(void)
 {
-    /* Update clock state */
-    zxprinter_clock_state ^= 1;
+    /* Read the pins */
+    uint16_t pins = zxprinter_gpio->idr;
+    uint16_t motor_off = (pins >> ZXPRINTER_PIN_MOTOR_OFF) & 1U;
+    uint16_t motor_slow = (pins >> ZXPRINTER_PIN_MOTOR_SLOW) & 1U;
+    /* Determine current and next clock step and level */
+    uint32_t clock_level = zxprinter_clock_level;
+    uint32_t next_clock_step = zxprinter_clock_step + 1;
+    uint32_t next_clock_level = (next_clock_step >> motor_slow) & 1U;
 
     /* If the clock is rising */
-    if (zxprinter_clock_state) {
-        unsigned int on_paper_prev, on_paper;
-        unsigned int on_line_prev, on_line;
+    if (next_clock_level > clock_level) {
+        /* If the motor is not off */
+        if (!motor_off) {
+            uint32_t cycle_step, next_cycle_step;
+            unsigned int on_paper, next_on_paper;
+            unsigned int on_line, next_on_line;
 
-        on_paper_prev = zxprinter_cycle_is_on_paper();
-        on_line_prev = zxprinter_cycle_is_on_line();
+            cycle_step = zxprinter_cycle_step;
+            on_paper = zxprinter_cycle_is_on_paper(cycle_step);
+            on_line = zxprinter_cycle_is_on_line(cycle_step);
 
-        /* If we finished one stylus cycle */
-        if (zxprinter_cycle_step >= ZXPRINTER_CYCLE_STEPS) {
-            zxprinter_cycle_step = 0;
-        /* Else, we're in a stylus cycle */
-        } else {
-            zxprinter_cycle_step++;
+            /* If we finished one stylus cycle */
+            if (zxprinter_cycle_is_finished(cycle_step)) {
+                next_cycle_step = 0;
+            /* Else, we're in a stylus cycle */
+            } else {
+                next_cycle_step = cycle_step + 1;
+            }
+
+            next_on_paper = zxprinter_cycle_is_on_paper(next_cycle_step);
+            next_on_line = zxprinter_cycle_is_on_line(next_cycle_step);
+
+            /* If we're not waiting for the line output */
+            if (!(next_on_line > on_line &&
+                  zxprinter_line_count_out < zxprinter_line_count_in)) {
+                /* Update outputs */
+                zxprinter_gpio->odr = \
+                    zxprinter_gpio->odr |
+                    ((next_on_paper > on_paper) << ZXPRINTER_PIN_PAPER) |
+                    (next_on_line << ZXPRINTER_PIN_ENCODER);
+
+                /* Advance the cycle step */
+                zxprinter_cycle_step = next_cycle_step;
+                /* Advance the clock step */
+                zxprinter_clock_step = next_clock_step;
+                /* Change the clock level */
+                zxprinter_clock_level = next_clock_level;
+            }
         }
-
-        on_paper = zxprinter_cycle_is_on_paper();
-        on_line = zxprinter_cycle_is_on_line();
-
-        /* Update outputs */
-        zxprinter_gpio->odr = \
-            zxprinter_gpio->odr |
-            ((on_paper > on_paper_prev) << ZXPRINTER_PIN_PAPER) |
-            (on_line << ZXPRINTER_PIN_ENCODER);
-
-        /* If we travelled out of the printable line */
-        if (on_line < on_line_prev) {
-            zxprinter_line_count++;
-        }
-    /* Else the clock is falling */
-    } else {
+    /* Else, if the clock is falling */
+    } else if (next_clock_level < clock_level) {
         /* If the stylus is on the line */
-        if (zxprinter_cycle_is_on_line()) {
+        if (zxprinter_cycle_is_on_line(zxprinter_cycle_step)) {
             uint32_t dot = (zxprinter_cycle_step -
                             ZXPRINTER_CYCLE_MARGIN_STEPS);
             uint8_t byte = dot >> 3;
             uint8_t bit = 7 - (dot & 0x7);
-            uint8_t stylus = ((zxprinter_gpio->idr >>
-                               ZXPRINTER_PIN_STYLUS) & 1);
+            uint8_t stylus = ((pins >> ZXPRINTER_PIN_STYLUS) & 1);
             /* Record dot state */
             zxprinter_line_buf[byte] =
                 (zxprinter_line_buf[byte] & ~(1 << bit)) |
                 (stylus << bit);
+            /* Signal if the line is complete */
+            if (dot + 1 >= ZXPRINTER_LINE_LEN) {
+                zxprinter_line_count_in++;
+            }
         }
+        /* Advance the clock step */
+        zxprinter_clock_step = next_clock_step;
+        /* Change the clock level */
+        zxprinter_clock_level = next_clock_level;
+    /* Else, if the clock level is steady */
+    } else {
+        /* Advance the clock step */
+        zxprinter_clock_step = next_clock_step;
     }
 
     /* Clear the interrupt flags */
@@ -156,42 +204,17 @@ zxprinter_tim_handler(void)
 void
 zxprinter_write_handler(void)
 {
-    /* Read the written value */
-    uint16_t pins = zxprinter_gpio->idr;
+    uint16_t pins;
     /* Reset the "latches" ASAP */
     zxprinter_gpio->odr = zxprinter_gpio->odr &
                             ~((1U << ZXPRINTER_PIN_PAPER) |
                               (1U << ZXPRINTER_PIN_ENCODER));
-
-    /* If motor is turned off */
-    if (pins & (1U << ZXPRINTER_PIN_MOTOR_OFF)) {
-        /* Stop counting */
-        zxprinter_tim->cr1 &= ~TIM_CR1_CEN_MASK;
-    /* Else the motor is turned on */
-    } else {
-        uint16_t curr_arr = zxprinter_tim->arr;
-        uint16_t new_arr;
-        /* If motor is set to slow speed */
-        if (pins & (1U << ZXPRINTER_PIN_MOTOR_SLOW)) {
-            /* Set double timer period */
-            new_arr = ZXPRINTER_TIM_SLOW_PERIOD_US;
-        /* Else motor is set to normal speed */
-        } else {
-            /* Set normal timer period */
-            new_arr = ZXPRINTER_TIM_NORMAL_PERIOD_US;
-        }
-        /* If "motor speed" changed */
-        if (new_arr != curr_arr) {
-            /* Update period */
-            zxprinter_tim->arr = new_arr;
-        }
-        /* If "motor" was off */
-        if (!(zxprinter_tim->cr1 & TIM_CR1_CEN_MASK)) {
-            /* Ask to transfer data to shadow registers */
-            zxprinter_tim->egr |= TIM_EGR_UG_MASK;
-            /* Start counting */
-            zxprinter_tim->cr1 |= TIM_CR1_CEN_MASK;
-        }
+    /* Read the pins */
+    pins = zxprinter_gpio->idr;
+    /* If motor is on */
+    if (!((pins >> ZXPRINTER_PIN_MOTOR_OFF) & 1U)) {
+        /* Start counting */
+        zxprinter_tim->cr1 |= TIM_CR1_CEN_MASK;
     }
 }
 
@@ -208,8 +231,13 @@ zxprinter_init(volatile struct gpio *gpio,
     zxprinter_tim = tim;
     zxprinter_line_buf = line_buf;
     /* Start in the air */
-    zxprinter_clock_state = 0;
+    zxprinter_clock_step = 0;
+    zxprinter_clock_level = 0;
     zxprinter_cycle_step = ZXPRINTER_CYCLE_STEPS;
+    /* No lines input */
+    zxprinter_line_count_in = 0;
+    /* No lines output */
+    zxprinter_line_count_out = 0;
 
     /*
      * Setup the I/O pins
@@ -238,15 +266,17 @@ zxprinter_init(volatile struct gpio *gpio,
     zxprinter_tim->cr1 = (zxprinter_tim->cr1 & ~TIM_CR1_DIR_MASK) |
                          (TIM_CR1_DIR_VAL_DOWN << TIM_CR1_DIR_LSB) |
                          TIM_CR1_ARPE_MASK;
+    /* Set the period */
+    zxprinter_tim->arr = ZXPRINTER_CYCLE_STEP_PERIOD_US / 2;
+    /* Ask to transfer data to shadow registers */
+    zxprinter_tim->egr |= TIM_EGR_UG_MASK;
     /* Enable Capture/Compare 1 interrupt */
     zxprinter_tim->dier |= TIM_DIER_CC1IE_MASK;
 
     /* Set initial paper state */
-    gpio_pin_set(zxprinter_gpio, ZXPRINTER_PIN_PAPER,
-                 zxprinter_cycle_is_on_paper());
+    gpio_pin_set(zxprinter_gpio, ZXPRINTER_PIN_PAPER, 0);
     /* Set initial encoder state */
-    gpio_pin_set(zxprinter_gpio, ZXPRINTER_PIN_ENCODER,
-                 zxprinter_clock_state && zxprinter_cycle_is_on_line());
+    gpio_pin_set(zxprinter_gpio, ZXPRINTER_PIN_ENCODER, 0);
     /* Signal printer interface is ready */
     gpio_pin_set(zxprinter_gpio, ZXPRINTER_PIN_READY, 1);
 }

@@ -422,3 +422,30 @@ Or, could we simply clear the outputs on detecting the write signal in the
 MCU? We should be able to outrun the host issuing a follow-up read, won't we?
 Sounds good. We won't have the learning opportunity, but we could save time
 and money on building the necessary circuit.
+
+---
+
+We now have both the interfaces working separately and it's time to connect
+them. We can have the ZX Printer interface store the input in a buffer, and
+have another buffer for the output, so that we can center or scale it, if
+necessary.
+
+We will also have a problem with timing, because even the standard ZX Printer
+speed is faster than what 9600 baud of the thermal printer interface would
+allow, and we could make the former go much faster.
+
+We can have a big buffer in our RAM, plus employ flow control on the ZX
+Printer side. We can even have e.g. RLE or even LZW compression for the input
+if we really want to have a bigger buffer.
+
+Ultimately, though, we'll have to slow down the input once our buffer is full,
+and we can do that by raising a flag inside the ZX Printer module to ask it to
+wait before starting inputting the line.
+
+Lastly, we need to deal with the matter of the ZX Printer turning off the
+motor before the clock goes down and us not completing a line, which could be
+fixed by moving the motor power and speed control to the timer interrupt
+handler.
+
+So, we could have another bit for clock being flipped before we would advance
+the cycle step.

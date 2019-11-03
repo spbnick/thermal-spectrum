@@ -1586,8 +1586,12 @@ main(void)
     }
 #endif
 
-    /* Stop */
+    /* Transmit */
     do {
         asm ("wfi");
+        if (zxprinter_line_count_in > zxprinter_line_count_out) {
+            printer_print_line((const uint8_t *)line_buf);
+            zxprinter_line_count_out++;
+        }
     } while (1);
 }
