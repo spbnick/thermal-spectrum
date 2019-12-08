@@ -20764,7 +20764,7 @@ F 4 "C23193" V 9050 1600 50  0001 C CNN "LCSC"
 $EndComp
 NoConn ~ 8700 3600
 Wire Wire Line
-	3500 7100 4000 7100
+	3500 7100 3900 7100
 $Comp
 L Device:R R3
 U 1 1 5E7F9AF0
@@ -20778,7 +20778,7 @@ F 4 "C25804" H 3900 7250 50  0001 C CNN "LCSC"
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2100 6750 2900 6750
+	2100 6750 2650 6750
 $Comp
 L Device:R R1
 U 1 1 5E8016A8
@@ -20804,7 +20804,7 @@ F 4 "C25804" H 4250 2900 50  0001 C CNN "LCSC"
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	4050 3800 4700 3800
+	4050 3800 4250 3800
 $Comp
 L Device:R R5
 U 1 1 5E81287B
@@ -20843,4 +20843,13 @@ F 4 "C72041" H 8600 1200 50  0001 C CNN "LCSC"
 	1    8600 1200
 	-1   0    0    1   
 $EndComp
+Connection ~ 3900 7100
+Wire Wire Line
+	3900 7100 4000 7100
+Connection ~ 2650 6750
+Wire Wire Line
+	2650 6750 2900 6750
+Connection ~ 4250 3800
+Wire Wire Line
+	4250 3800 4700 3800
 $EndSCHEMATC
