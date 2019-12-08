@@ -1,1 +1,10 @@
 *.bak
+*.stl
+*.dxf
+*.FCStd[1-9]
+*.net
+*.zip
+*.bak
+*-bak
+fp-info-cache
+gerbers
