@@ -20583,19 +20583,6 @@ $EndComp
 Wire Wire Line
 	800  1700 1050 1700
 $Comp
-L power:GND #PWR05
-U 1 1 5E1E0363
-P 800 2400
-F 0 "#PWR05" H 800 2150 50  0001 C CNN
-F 1 "GND" H 805 2227 50  0000 C CNN
-F 2 "" H 800 2400 50  0001 C CNN
-F 3 "" H 800 2400 50  0001 C CNN
-	1    800  2400
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	800  2400 1050 2400
-$Comp
 L power:PWR_FLAG #FLG01
 U 1 1 5E1F67F9
 P -2250 1500
@@ -20919,4 +20906,5 @@ F 3 "" H -1100 500 50  0001 C CNN
 	1    -1100 500 
 	1    0    0    -1  
 $EndComp
+NoConn ~ 1050 2400
 $EndSCHEMATC
