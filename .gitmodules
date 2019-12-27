@@ -1,0 +1,3 @@
+[submodule "printer.kicad/kicad-symbols"]
+	path = printer.kicad/kicad-symbols
+	url = https://github.com/KiCad/kicad-symbols.git
