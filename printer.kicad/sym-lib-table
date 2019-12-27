@@ -1,4 +1,5 @@
 (sym_lib_table
   (lib (name printer)(type Legacy)(uri ${KIPRJMOD}/printer.lib)(options "")(descr ""))
   (lib (name printer-rescue)(type Legacy)(uri ${KIPRJMOD}/printer-rescue.lib)(options "")(descr ""))
+  (lib (name Master_Regulator_Linear)(type Legacy)(uri ${KIPRJMOD}/kicad-symbols/Regulator_Linear.lib)(options "")(descr ""))
 )
