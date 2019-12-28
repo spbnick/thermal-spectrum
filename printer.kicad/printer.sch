@@ -19651,10 +19651,6 @@ Wire Wire Line
 	3900 5000 4700 5000
 Wire Wire Line
 	4700 5000 4700 5500
-Text Label 8150 4900 0    50   ~ 0
-DEBUG_TX
-Text Label 8150 5000 0    50   ~ 0
-DEBUG_RX
 Text Label 8150 4700 0    50   ~ 0
 WRITE
 Text Label 8150 4600 0    50   ~ 0
@@ -19669,10 +19665,6 @@ Text Label 8150 5300 0    50   ~ 0
 MOTOR_SLOW
 Text Label 8150 5400 0    50   ~ 0
 MOTOR_OFF
-Wire Wire Line
-	8150 4900 8700 4900
-Wire Wire Line
-	8150 5000 8700 5000
 Wire Wire Line
 	8150 4700 8700 4700
 Wire Wire Line
@@ -19894,8 +19886,6 @@ $EndComp
 Wire Wire Line
 	3250 2850 3900 2850
 Wire Wire Line
-	3900 4100 3900 3550
-Wire Wire Line
 	4250 3050 4250 3150
 $Comp
 L power:+3.3V #PWR014
@@ -19919,8 +19909,6 @@ F 3 "" H 4250 3450 50  0001 C CNN
 	1    4250 3450
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	3250 3550 3900 3550
 Text Label 3800 3050 2    50   ~ 0
 PROGRAM_TX
 Text Label 3800 3150 2    50   ~ 0
@@ -20104,17 +20092,6 @@ Wire Notes Line width 10
 	6550 600  6550 1750
 Text Notes 6600 800  0    118  ~ 24
 MCU Power
-$Comp
-L Connector:Conn_01x08_Male J2
-U 1 1 5E996EA0
-P 3050 3250
-F 0 "J2" H 3400 2600 50  0000 R CNN
-F 1 "Conn_01x08_Male" H 3700 2700 50  0000 R CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical" H 3050 3250 50  0001 C CNN
-F 3 "~" H 3050 3250 50  0001 C CNN
-	1    3050 3250
-	1    0    0    1   
-$EndComp
 Wire Wire Line
 	3900 2850 3900 2750
 Text Label 4700 3800 2    50   ~ 0
@@ -20157,10 +20134,6 @@ Wire Wire Line
 	3250 2950 3900 2950
 Wire Wire Line
 	3900 2950 3900 3150
-Wire Wire Line
-	4050 3800 4050 3450
-Wire Wire Line
-	4050 3450 3250 3450
 Wire Wire Line
 	3900 3150 4250 3150
 Connection ~ 4250 3150
@@ -20272,8 +20245,6 @@ Wire Wire Line
 	8700 3500 8150 3500
 Text Label 8150 3500 0    50   ~ 0
 STATUS_LED
-Text Label 3800 3450 2    50   ~ 0
-BOOT0
 Text Label 3800 2950 2    50   ~ 0
 ~RESET
 $Comp
@@ -20649,14 +20620,6 @@ F 3 "" H 10800 1150 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	10250 1150 10800 1150
-Text Label 3800 3250 2    50   ~ 0
-DEBUG_TX
-Text Label 3800 3350 2    50   ~ 0
-DEBUG_RX
-Wire Wire Line
-	3800 3350 3250 3350
-Wire Wire Line
-	3800 3250 3250 3250
 Wire Notes Line width 10
 	9900 1750 11100 1750
 Wire Notes Line width 10
@@ -20907,4 +20870,25 @@ F 3 "" H -1100 500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 NoConn ~ 1050 2400
+$Comp
+L Connector:Conn_01x06_Male J2
+U 1 1 5E08EF06
+P 3050 3050
+F 0 "J2" H 3200 3500 50  0000 C CNN
+F 1 "Conn_01x06_Male" H 3350 3400 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical" H 3050 3050 50  0001 C CNN
+F 3 "~" H 3050 3050 50  0001 C CNN
+	1    3050 3050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4050 3800 4050 3250
+Wire Wire Line
+	4050 3250 3250 3250
+Text Label 3800 3250 2    50   ~ 0
+BOOT0
+Wire Wire Line
+	3900 4100 3900 3350
+Wire Wire Line
+	3250 3350 3900 3350
 $EndSCHEMATC
