@@ -20844,17 +20844,6 @@ F 3 "" H -1100 500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 NoConn ~ 1050 2400
-$Comp
-L Connector:Conn_01x06_Male J2
-U 1 1 5E08EF06
-P 3050 3050
-F 0 "J2" H 3200 3500 50  0000 C CNN
-F 1 "Conn_01x06_Male" H 3350 3400 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical" H 3050 3050 50  0001 C CNN
-F 3 "~" H 3050 3050 50  0001 C CNN
-	1    3050 3050
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	4050 3800 4050 3250
 Wire Wire Line
@@ -20869,4 +20858,15 @@ Wire Wire Line
 	7650 2900 8050 2900
 Wire Wire Line
 	7650 3300 8700 3300
+$Comp
+L Connector:Conn_01x06_Male J2
+U 1 1 5E08EF06
+P 3050 3150
+F 0 "J2" H 3100 2600 50  0000 C CNN
+F 1 "Conn_01x06_Male" H 3350 2700 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical" H 3050 3150 50  0001 C CNN
+F 3 "~" H 3050 3150 50  0001 C CNN
+	1    3050 3150
+	1    0    0    1   
+$EndComp
 $EndSCHEMATC
