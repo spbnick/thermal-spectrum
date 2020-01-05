@@ -2,3 +2,5 @@
 *.d
 *.elf
 *.o
+*.csv
+*.xml
