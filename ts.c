@@ -1514,29 +1514,6 @@ main(void)
                     RCC_APB2ENR_AFIOEN_MASK;
 
     /*
-     * Initialize debug GPIO pin
-     */
-    gpio_pin_conf(GPIO_A, 7,
-                  GPIO_MODE_OUTPUT_50MHZ, GPIO_CNF_OUTPUT_GP_PUSH_PULL);
-
-    /*
-     * Initialize debug USART
-     */
-    /* Configure debug TX pin (PB10) */
-    gpio_pin_conf(GPIO_B, 10,
-                  GPIO_MODE_OUTPUT_50MHZ,
-                  GPIO_CNF_OUTPUT_AF_PUSH_PULL);
-    /* Configure debug RX pin (PB11) */
-    gpio_pin_conf(GPIO_B, 11,
-                  GPIO_MODE_INPUT,
-                  GPIO_CNF_INPUT_FLOATING);
-    /* Enable clock to USART3 */
-    RCC->apb1enr |= RCC_APB1ENR_USART3EN_MASK;
-    /* Initialize the USART with 115200 baud rate, based on 36MHz PCLK1 */
-    usart_init(USART3, 36 * 1000 * 1000, 115200);
-
-
-    /*
      * Setup printer with USART2 at 9600 baud rate and
      * TIM2 timer fed by doubled 36MHz APB1 clock
      */
