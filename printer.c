@@ -91,7 +91,14 @@ printer_init(volatile struct usart *usart,
              volatile struct gpio *busy_gpio,
              unsigned int busy_pin)
 {
-    static const uint8_t config_cmd[] = {0x1B, 0x37, 0x03, 0x70, 0x0C};
+    static const uint8_t config_cmd[] = {
+        0x1B, 0x37,
+        /* Max simultaneously heated dots, in units of 8 dots minus one */
+        0x03,
+        /* Heating time, in 10us units */
+        0x70,
+        /* Heating interval, in 10us units */
+        0x0C};
     static const uint8_t reset_cmd[] = {0x1B, 0x40};
     /*
      * Initialize the variables
