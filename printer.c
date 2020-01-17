@@ -91,6 +91,7 @@ printer_init(volatile struct usart *usart,
              volatile struct gpio *busy_gpio,
              unsigned int busy_pin)
 {
+    static const uint8_t init_cmd[] = {0x1B, 0x40};
     static const uint8_t config_cmd[] = {
         0x1B, 0x37,
         /* Max simultaneously heated dots, in units of 8 dots minus one */
@@ -124,6 +125,7 @@ printer_init(volatile struct usart *usart,
      * Initialize the printer after a power-on
      */
     printer_transmit(NULL, 0, 30000);
+    printer_transmit(init_cmd, sizeof(init_cmd), 5000);
     printer_transmit(config_cmd, sizeof(config_cmd), 28);
     printer_transmit(reset_cmd, sizeof(reset_cmd), 354);
 }
