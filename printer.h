@@ -5,6 +5,7 @@
 #ifndef _PRINTER_H
 #define _PRINTER_H
 
+#include <gpio.h>
 #include <usart.h>
 #include <tim.h>
 #include <stdint.h>
@@ -19,10 +20,15 @@
  *                  The printer_handler() function should be arranged to be
  *                  called for the specified timer's interrupts.
  * @param ck_int    Frequency of the clock fed to the timer (CK_INT).
+ * @param busy_gpio The GPIO port used to output the printer busy status.
+ * @param busy_pin  The pin on the GPIO port used to output the printer busy
+ *                  status.
  */
 extern void printer_init(volatile struct usart *usart,
                          volatile struct tim *tim,
-                         uint32_t ck_int);
+                         uint32_t ck_int,
+                         volatile struct gpio *busy_gpio,
+                         unsigned int busy_pin);
 
 /**
  * Printer's timer interrupt handler.

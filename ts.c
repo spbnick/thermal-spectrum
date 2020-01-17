@@ -1511,7 +1511,11 @@ main(void)
      */
     /* Enable APB2 clock to I/O ports A and B, and AFIO */
     RCC->apb2enr |= RCC_APB2ENR_IOPAEN_MASK | RCC_APB2ENR_IOPBEN_MASK |
-                    RCC_APB2ENR_AFIOEN_MASK;
+                    RCC_APB2ENR_IOPCEN_MASK | RCC_APB2ENR_AFIOEN_MASK;
+
+    /* Configure status LED */
+    gpio_pin_conf(GPIO_C, 13,
+                  GPIO_MODE_OUTPUT_2MHZ, GPIO_CNF_OUTPUT_GP_OPEN_DRAIN);
 
     /*
      * Setup printer with USART2 at 9600 baud rate and
@@ -1536,7 +1540,7 @@ main(void)
     nvic_int_set_enable(NVIC_INT_TIM2);
 
     /* Initialize printer module */
-    printer_init(USART2, TIM2, 72000000);
+    printer_init(USART2, TIM2, 72000000, GPIO_C, 13);
 
     /*
      * Setup ZX Printer interface with GPIO_B for I/O and
