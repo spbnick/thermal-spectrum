@@ -100,7 +100,6 @@ printer_init(volatile struct usart *usart,
         0x70,
         /* Heating interval, in 10us units */
         0x0C};
-    static const uint8_t reset_cmd[] = {0x1B, 0x40};
     /*
      * Initialize the variables
      */
@@ -127,7 +126,6 @@ printer_init(volatile struct usart *usart,
     printer_transmit(NULL, 0, 30000);
     printer_transmit(init_cmd, sizeof(init_cmd), 5000);
     printer_transmit(config_cmd, sizeof(config_cmd), 28);
-    printer_transmit(reset_cmd, sizeof(reset_cmd), 354);
 }
 
 void
