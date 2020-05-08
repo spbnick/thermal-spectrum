@@ -1,5 +1,29 @@
 EESchema-DOCLIB  Version 2.0
 #
+$CMP INA180A2
+D Current Shunt Monitor  –0.2 V to +26 V Common-Mode Range, 50V/V, SOT-23-5
+K current sense shunt monitor
+F http://www.ti.com/lit/ds/symlink/ina180.pdf
+$ENDCMP
+#
+$CMP INA194
+D Current Shunt Monitor −16V to +80V Common-Mode Range, 50V/V, SOT-23-5
+K current sense shunt monitor
+F http://www.ti.com/lit/ds/symlink/ina193.pdf
+$ENDCMP
+#
+$CMP INA195
+D Current Shunt Monitor −16V to +80V Common-Mode Range, 100V/V, SOT-23-5
+K current sense shunt monitor
+F http://www.ti.com/lit/ds/symlink/ina193.pdf
+$ENDCMP
+#
+$CMP ZX_Spectrum_128K_expansion
+D Generic connector, double row, 02x28, row letter first pin numbering scheme (pin number consists of a letter for the row and a number for the pin index in this row. a1, ..., aN; b1, ..., bN), script generated (kicad-library-utils/schlib/autogen/connector/)
+K connector
+F ~
+$ENDCMP
+#
 $CMP board_socket
 D Generic connector, double row, 02x28, row letter first pin numbering scheme (pin number consists of a letter for the row and a number for the pin index in this row. a1, ..., aN; b1, ..., bN), script generated (kicad-library-utils/schlib/autogen/connector/)
 K connector
