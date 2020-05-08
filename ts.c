@@ -68,14 +68,14 @@ main(void)
     RCC->apb2enr |= RCC_APB2ENR_IOPAEN_MASK | RCC_APB2ENR_IOPBEN_MASK |
                     RCC_APB2ENR_IOPCEN_MASK | RCC_APB2ENR_AFIOEN_MASK;
 
-    /* Configure status LED */
-    gpio_pin_conf(GPIO_C, 13,
-                  GPIO_MODE_OUTPUT_2MHZ, GPIO_CNF_OUTPUT_GP_OPEN_DRAIN);
-
     /*
      * Setup printer with USART2 at 9600 baud rate and
      * TIM2 timer fed by doubled 36MHz APB1 clock
      */
+    /* Configure status LED */
+    gpio_pin_conf(GPIO_C, 13,
+                  GPIO_MODE_OUTPUT_2MHZ, GPIO_CNF_OUTPUT_GP_OPEN_DRAIN);
+
     /* Configure printer TX pin (PA2) */
     gpio_pin_conf(GPIO_A, 2,
                   GPIO_MODE_OUTPUT_50MHZ,
