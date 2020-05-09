@@ -45,7 +45,7 @@ printer_is_busy(void)
 }
 
 void
-printer_handler(void)
+printer_tim_handler(void)
 {
     if (printer_tim->sr & TIM_SR_CC1IF_MASK) {
         /* Free up the printer */

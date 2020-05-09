@@ -19,7 +19,7 @@ void tim2_irq_handler(void) __attribute__ ((isr));
 void
 tim2_irq_handler(void)
 {
-    printer_handler();
+    printer_tim_handler();
 }
 
 void tim3_irq_handler(void) __attribute__ ((isr));

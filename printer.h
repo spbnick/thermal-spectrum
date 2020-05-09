@@ -36,7 +36,7 @@ extern void printer_init(volatile struct usart *usart,
  * Must be called when an interrupt is triggered for the timer passed
  * previously to printer_init().
  */
-extern void printer_handler(void);
+extern void printer_tim_handler(void);
 
 /**
  * Print a line of pixels to the printer.
