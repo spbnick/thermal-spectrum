@@ -22,6 +22,13 @@ tim2_irq_handler(void)
     printer_tim_handler();
 }
 
+void adc1_2_irq_handler(void) __attribute__ ((isr));
+void
+adc1_2_irq_handler(void)
+{
+    printer_adc_handler();
+}
+
 void tim3_irq_handler(void) __attribute__ ((isr));
 void
 tim3_irq_handler(void)
@@ -71,7 +78,8 @@ main(void)
     /*
      * Setup printer with the following.
      * - USART2 at 9600 baud rate, for talking to the printer.
-     * - TIM2 timer fed by doubled 36MHz APB1 clock.
+     * - ADC1 channel 0, for monitoring printer status via its power line.
+     * - TIM2 timer fed by doubled 36MHz APB1 clock, for ADC timing.
      * - PC13 GPIO pin for status LED.
      */
 
@@ -92,6 +100,37 @@ main(void)
     usart_init(USART2, 36 * 1000 * 1000, 9600);
 
     /*
+     * Setup ADC
+     */
+    /* Set ADC clock prescaler to produce 12MHz */
+    RCC->cfgr = (RCC->cfgr & (~RCC_CFGR_ADCPRE_MASK)) |
+                (RCC_CFGR_ADCPRE_VAL_PCLK2_DIV6 << RCC_CFGR_ADCPRE_LSB);
+    /* Enable clock to ADC1 */
+    RCC->apb2enr |= RCC_APB2ENR_ADC1EN_MASK;
+    /* Configure ADC pin */
+    gpio_pin_conf(GPIO_A, 0,
+                  GPIO_MODE_INPUT, GPIO_CNF_INPUT_ANALOG);
+    /* Turn on ADC */
+    ADC1->cr2 |= ADC_CR2_ADON_MASK;
+    /*
+     * Wait for at least 1us for ADC to stabilize, and for two ADC cycles
+     * before starting calibration.
+     * TODO Calibrate the delay loop.
+     */
+    {
+        volatile unsigned int i;
+        for (i = 0; i < 360; i++);
+    }
+    /* Calibrate the ADC */
+    ADC1->cr2 |= ADC_CR2_CAL_MASK;
+    while (ADC1->cr2 & ADC_CR2_CAL_MASK);
+    /* Power down the ADC */
+    ADC1->cr2 &= ~ADC_CR2_ADON_MASK;
+
+    /* Enable ADC interrupt */
+    nvic_int_set_enable(NVIC_INT_ADC1_2);
+
+    /*
      * Setup timer
      */
     /* Enable clock to the timer */
@@ -103,11 +142,18 @@ main(void)
      * Setup status LED
      */
     /* Configure status LED */
+    gpio_pin_set(GPIO_C, 13, 1);
     gpio_pin_conf(GPIO_C, 13,
                   GPIO_MODE_OUTPUT_2MHZ, GPIO_CNF_OUTPUT_GP_OPEN_DRAIN);
 
     /* Initialize printer module */
-    printer_init(USART2, TIM2, 72000000, GPIO_C, 13);
+    printer_init(USART2,
+                 /* ADC channel */
+                 ADC1, 0,
+                 /* Timer */
+                 TIM2, 72000000,
+                 /* Status LED GPIO pin */
+                 GPIO_C, 13);
 
     /*
      * Setup ZX Printer interface with GPIO_B for I/O and
