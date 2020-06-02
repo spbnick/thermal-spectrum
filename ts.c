@@ -69,13 +69,15 @@ main(void)
                     RCC_APB2ENR_IOPCEN_MASK | RCC_APB2ENR_AFIOEN_MASK;
 
     /*
-     * Setup printer with USART2 at 9600 baud rate and
-     * TIM2 timer fed by doubled 36MHz APB1 clock
+     * Setup printer with the following.
+     * - USART2 at 9600 baud rate, for talking to the printer.
+     * - TIM2 timer fed by doubled 36MHz APB1 clock.
+     * - PC13 GPIO pin for status LED.
      */
-    /* Configure status LED */
-    gpio_pin_conf(GPIO_C, 13,
-                  GPIO_MODE_OUTPUT_2MHZ, GPIO_CNF_OUTPUT_GP_OPEN_DRAIN);
 
+    /*
+     * Setup USART
+     */
     /* Configure printer TX pin (PA2) */
     gpio_pin_conf(GPIO_A, 2,
                   GPIO_MODE_OUTPUT_50MHZ,
@@ -89,10 +91,20 @@ main(void)
     /* Initialize the USART with 9600 baud rate, based on 36MHz PCLK1 */
     usart_init(USART2, 36 * 1000 * 1000, 9600);
 
+    /*
+     * Setup timer
+     */
     /* Enable clock to the timer */
     RCC->apb1enr |= RCC_APB1ENR_TIM2EN_MASK;
     /* Enable timer interrupt */
     nvic_int_set_enable(NVIC_INT_TIM2);
+
+    /*
+     * Setup status LED
+     */
+    /* Configure status LED */
+    gpio_pin_conf(GPIO_C, 13,
+                  GPIO_MODE_OUTPUT_2MHZ, GPIO_CNF_OUTPUT_GP_OPEN_DRAIN);
 
     /* Initialize printer module */
     printer_init(USART2, TIM2, 72000000, GPIO_C, 13);
