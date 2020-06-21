@@ -330,9 +330,9 @@ printer_init(volatile struct usart *usart,
     static const uint8_t config_cmd[] = {
         0x1B, 0x37,
         /* Max simultaneously heated dots, in units of 8 dots minus one */
-        0x03,
+        0x02,
         /* Heating time, in 10us units */
-        0x70,
+        0xB0,
         /* Heating interval, in 10us units */
         0x0C};
     static const uint8_t feed_cmd[] = {0x1B, 0x4A, 0x03};
