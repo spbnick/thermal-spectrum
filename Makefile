@@ -11,8 +11,6 @@ all: $(NAME).bin
 
 # Module names in order of symbol resolution
 MODS = \
-    circular_buf \
-    serial \
     printer \
     zxprinter \
     $(NAME)
