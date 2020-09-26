@@ -33,7 +33,8 @@ DEPS = $(OBJS:.o=.d)
 	$(CCPFX)objcopy -O binary $< $@
 
 $(NAME).elf: $(OBJS) $(LDSCRIPTS)
-	$(CCPFX)ld $(LDFLAGS) -T libstammer.ld -o $@ $(OBJS) $(LIBS)
+	$(CCPFX)gcc -nostartfiles $(COMMON_CFLAGS) $(CFLAGS) $(LDFLAGS) \
+		-T libstammer.ld -o $@ $(OBJS) $(LIBS)
 
 clean:
 	rm -f $(OBJS)
